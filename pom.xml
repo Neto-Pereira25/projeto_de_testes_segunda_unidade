@@ -5,9 +5,41 @@
     <artifactId>projetoDeTestesSegundaUnidade</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
         <exec.mainClass>com.teste.dsc.projetodetestessegundaunidade.ProjetoDeTestesSegundaUnidade</exec.mainClass>
+        <java.version>17</java.version>
+        <junit.version>5.10.1</junit.version>
+        <mockito.version>5.11.0</mockito.version>
     </properties>
+    
+    <dependencies>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito Core -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito + JUnit 5 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 </project>
