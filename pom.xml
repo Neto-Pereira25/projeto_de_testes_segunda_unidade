@@ -8,7 +8,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>24</maven.compiler.release>
+        <maven.compiler.release>23</maven.compiler.release>
         <exec.mainClass>com.teste.dsc.projetodetestessegundaunidade.ProjetoDeTestesSegundaUnidade</exec.mainClass>
         <java.version>17</java.version>
         <junit.version>5.10.1</junit.version>
