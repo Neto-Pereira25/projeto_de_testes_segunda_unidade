@@ -33,7 +33,7 @@ public class RegisterUserTest {
     RegisterUserService service;
 
     @Test
-    void registerUserWithValidFields() {
+    void testRegisterUserWithValidFields() {
         User user = new User(
                 "exemplo@teste.com",
                 "123456",
