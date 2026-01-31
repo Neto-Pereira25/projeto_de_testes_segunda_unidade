@@ -27,12 +27,12 @@ public class RegisterUserService {
             String surname,
             String cpf,
             String birthDate) {
-        
-        validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
         if (!password.equals(passwordConfirmation)) {
             throw new BusinessRuleException("Password and password confirmation must be the same!");
         }
+
+        validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
         User user = new User(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
@@ -48,13 +48,13 @@ public class RegisterUserService {
             String surname,
             String cpf,
             String birthDate) {
-        if (name == null || name.isBlank() 
+        if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
-                || email == null || email.isBlank() 
+                || email == null || email.isBlank()
                 || cpf == null || cpf.isBlank()
-                || password == null || password .isBlank()
-                || passwordConfirmation == null || passwordConfirmation .isBlank()
-                || birthDate== null || birthDate.isBlank()) {
+                || password == null || password.isBlank()
+                || passwordConfirmation == null || passwordConfirmation.isBlank()
+                || birthDate == null || birthDate.isBlank()) {
 
             throw new BusinessRuleException("Invalid required fields");
         }

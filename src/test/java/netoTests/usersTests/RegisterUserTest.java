@@ -90,4 +90,27 @@ public class RegisterUserTest {
 
         verify(userRepository, never()).saveUser(any(User.class));
     }
+
+    @Test
+    void testRegisterUserWithEmptyPasswordConfirmationField() {
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.register(
+                        "user@gmail.com",
+                        "Senh@123",
+                        "",
+                        "usuario",
+                        "Silva",
+                        "12345678910",
+                        "01/01/1970"
+                )
+        );
+
+        assertEquals(
+                "Password and password confirmation must be the same!",
+                exception.getMessage()
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
 }
