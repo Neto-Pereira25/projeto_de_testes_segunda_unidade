@@ -4,11 +4,19 @@
  */
 package netoTests.usersTests;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.services.RegisterUserService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -19,32 +27,37 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class RegisterUserTest {
 
     @Mock
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @InjectMocks
-    private RegisterUserService service;
+    RegisterUserService service;
 
     @Test
-    public void cadastrarUsuarioComCamposValidos() {
-        var email = "exemplo@teste.com";
-        var password = "123456";
-        var passwordConfirmation = "123456";
-        var name = "Bob";
-        var surname = "Brown";
-        var cpf = "123.456.789-01";
-        var birthDate = "10/09/1999";
+    void registerUserWithValidFields() {
+        User user = new User(
+                "exemplo@teste.com",
+                "123456",
+                "123456",
+                "Bob",
+                "Brown",
+                "123.456.789-01",
+                "10/09/1999");
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.saveUser(any(User.class))).thenReturn(user);
 
         User registeredUser = service.register(
-                email, password,
-                passwordConfirmation, name,
-                surname, cpf,
-                birthDate);
+                "exemplo@teste.com",
+                "123456",
+                "123456",
+                "Bob",
+                "Brown",
+                "123.456.789-01",
+                "10/09/1999"
+        );
 
         assertNotNull(registeredUser);
         assertEquals("Bob", registeredUser.getName());
 
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).saveUser(any(User.class));
     }
 }
