@@ -36,8 +36,8 @@ public class RegisterUserTest {
     void testRegisterUserWithValidFields() {
         User user = new User(
                 "exemplo@teste.com",
-                "123456",
-                "123456",
+                "Senh@123",
+                "Senh@123",
                 "Bob",
                 "Brown",
                 "123.456.789-01",
@@ -46,17 +46,17 @@ public class RegisterUserTest {
         when(userRepository.saveUser(any(User.class))).thenReturn(user);
 
         User registeredUser = service.register(
-                "exemplo@teste.com",
-                "123456",
-                "123456",
-                "Bob",
+                "exemplo@exemplo.com",
+                "Senh@123",
+                "Senh@123",
+                "Dylan",
                 "Brown",
-                "123.456.789-01",
+                "123.456.789-02",
                 "10/09/1999"
         );
 
         assertNotNull(registeredUser);
-        assertEquals("Bob", registeredUser.getName());
+        assertEquals("Dylan", registeredUser.getName());
 
         verify(userRepository, times(1)).saveUser(any(User.class));
     }
