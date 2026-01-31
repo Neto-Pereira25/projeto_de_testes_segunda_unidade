@@ -5,15 +5,18 @@
 package netoTests.usersTests;
 
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.services.RegisterUserService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,29 +38,56 @@ public class RegisterUserTest {
     @Test
     void testRegisterUserWithValidFields() {
         User user = new User(
-                "exemplo@teste.com",
+                "user@gmail.com",
                 "Senh@123",
                 "Senh@123",
-                "Bob",
-                "Brown",
-                "123.456.789-01",
-                "10/09/1999");
+                "usuario",
+                "Silva",
+                "12345678910",
+                "01/01/1970"
+        );
 
         when(userRepository.saveUser(any(User.class))).thenReturn(user);
 
         User registeredUser = service.register(
-                "exemplo@exemplo.com",
+                "user@gmail.com",
                 "Senh@123",
                 "Senh@123",
-                "Dylan",
-                "Brown",
-                "123.456.789-02",
-                "10/09/1999"
+                "usuario",
+                "Silva",
+                "12345678910",
+                "01/01/1970"
         );
 
         assertNotNull(registeredUser);
-        assertEquals("Dylan", registeredUser.getName());
+        assertEquals("usuario", registeredUser.getName());
+
+        System.out.println("Esperado (A): " + user.getName());
+        System.out.println("Retornado: " + registeredUser.getName());
 
         verify(userRepository, times(1)).saveUser(any(User.class));
+    }
+
+    @Test
+    void testRegisterUserWithDifferentPasswordAndPasswordConfirmationFields() {
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.register(
+                        "user@gmail.com",
+                        "Senh@123",
+                        "Senh@Diferente123",
+                        "usuario",
+                        "Silva",
+                        "12345678910",
+                        "01/01/1970"
+                )
+        );
+
+        assertEquals(
+                "Password and password confirmation must be the same!",
+                exception.getMessage()
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
     }
 }
