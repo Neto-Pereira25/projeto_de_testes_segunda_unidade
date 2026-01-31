@@ -17,31 +17,34 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 public class RegisterUserTest {
-    
+
     @Mock
     private UserRepository userRepository;
-    
+
     @InjectMocks
     private RegisterUserService service;
-    
+
     @Test
-    public void cadastrarUsuarioComCamposValidos(){
-        User user = new User(
-                "exemplo@teste.com", 
-                "123456", 
-                "123456", 
-                "Bob", 
-                "Brown", 
-                "123.456.789-01", 
-                "10/09/1999");
-        
+    public void cadastrarUsuarioComCamposValidos() {
+        var email = "exemplo@teste.com";
+        var password = "123456";
+        var passwordConfirmation = "123456";
+        var name = "Bob";
+        var surname = "Brown";
+        var cpf = "123.456.789-01";
+        var birthDate = "10/09/1999";
+
         when(userRepository.save(any(User.class))).thenReturn(user);
-        
-        User registeredUser = service.register(user);
-        
+
+        User registeredUser = service.register(
+                email, password,
+                passwordConfirmation, name,
+                surname, cpf,
+                birthDate);
+
         assertNotNull(registeredUser);
         assertEquals("Bob", registeredUser.getName());
-        
+
         verify(userRepository, times(1)).save(any(User.class));
     }
 }
