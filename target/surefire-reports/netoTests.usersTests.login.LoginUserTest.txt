@@ -1,15 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: netoTests.usersTests.login.LoginUserTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.976 s <<< FAILURE! -- in netoTests.usersTests.login.LoginUserTest
-netoTests.usersTests.login.LoginUserTest.testLoginUserWithEmptyPasswordField -- Time elapsed: 1.854 s <<< FAILURE!
-org.opentest4j.AssertionFailedError: Expected com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException to be thrown, but nothing was thrown.
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
-	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:73)
-	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
-	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115)
-	at netoTests.usersTests.login.LoginUserTest.testLoginUserWithEmptyPasswordField(LoginUserTest.java:77)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.366 s -- in netoTests.usersTests.login.LoginUserTest

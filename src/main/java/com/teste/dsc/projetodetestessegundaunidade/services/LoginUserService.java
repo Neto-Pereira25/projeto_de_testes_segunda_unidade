@@ -17,6 +17,10 @@ public class LoginUserService {
         if (email == null || email.trim().isEmpty()) {
             throw new BusinessRuleException("Email cannot be empty");
         }
+        
+        if (password == null || password.trim().isEmpty()) {
+            throw new BusinessRuleException("Password cannot be empty");
+        }
 
         return userRepository.findByEmailAndPassword(email, password);
     }
