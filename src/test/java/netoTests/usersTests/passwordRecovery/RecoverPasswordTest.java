@@ -85,7 +85,7 @@ public class RecoverPasswordTest {
                 BusinessRuleException.class,
                 () -> service.recover(email, newPassword, confirmNewPassword));
 
-        assertEquals("Email cannot be empty", exception.getMessage());
+        assertEquals("Email cannot be empty.", exception.getMessage());
 
         verify(userRepository, never())
                 .findByEmail(anyString());
@@ -159,13 +159,29 @@ public class RecoverPasswordTest {
     public void testRecoveryPasswordWithWithEmptyNewPasswordField() {
         String email = "user@gmail.com";
         String newPassword = "";
-        String confirmNewPassword = "Senha@1234";
+        String confirmNewPassword = "Senha@123";
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.recover(email, newPassword, confirmNewPassword));
 
-        assertEquals("New password cannot be empty", exception.getMessage());
+        assertEquals("New password cannot be empty.", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmail(anyString());
+    }
+    
+    @Test
+    public void testRecoveryPasswordWithWithEmptyConfirmNewPasswordField() {
+        String email = "user@gmail.com";
+        String newPassword = "Senha@123";
+        String confirmNewPassword = "";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("Confirm new password cannot be empty.", exception.getMessage());
 
         verify(userRepository, never())
                 .findByEmail(anyString());

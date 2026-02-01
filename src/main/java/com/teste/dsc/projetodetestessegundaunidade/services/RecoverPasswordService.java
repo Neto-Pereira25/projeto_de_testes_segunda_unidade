@@ -17,15 +17,15 @@ public class RecoverPasswordService {
     public User recover(String email, String newPassword, String confirmNewPassword) {
 
         if (email == null || email.trim().isEmpty()) {
-            throw new BusinessRuleException("Email cannot be empty");
+            throw new BusinessRuleException("Email cannot be empty.");
         }
 
         if (newPassword == null || newPassword.trim().isEmpty()) {
-            throw new BusinessRuleException("New password cannot be empty");
+            throw new BusinessRuleException("New password cannot be empty.");
         }
 
         if (confirmNewPassword == null || confirmNewPassword.trim().isEmpty()) {
-            throw new BusinessRuleException("Confirm new password cannot be empty");
+            throw new BusinessRuleException("Confirm new password cannot be empty.");
         }
 
         if (!EmailValidator.isValid(email)) {
