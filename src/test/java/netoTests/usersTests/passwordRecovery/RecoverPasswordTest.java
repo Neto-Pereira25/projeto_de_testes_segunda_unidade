@@ -76,7 +76,7 @@ public class RecoverPasswordTest {
     }
     
     @Test
-    public void testLoginUserWithEmptyEmailField() {
+    public void testRecoveryPasswordWithEmptyEmailField() {
         String email = "";
         String newPassword = "Senha@123";
         String confirmNewPassword = "Senha@123";
@@ -92,7 +92,7 @@ public class RecoverPasswordTest {
     }
     
     @Test
-    public void testLoginUserWithInvalidEmailField() {
+    public void testRecoveryPasswordWithInvalidEmailField() {
         String email = "email-invalido#gmail.com";
         String newPassword = "Senha@123";
         String confirmNewPassword = "Senha@123";
@@ -102,6 +102,22 @@ public class RecoverPasswordTest {
                 () -> service.recover(email, newPassword, confirmNewPassword));
 
         assertEquals("Email field is invalid", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmail(anyString());
+    }
+    
+    @Test
+    public void testRecoveryPasswordWithDifferentPasswordAndPasswordConfirmationFields() {
+        String email = "user@gmail.com";
+        String newPassword = "SENHA";
+        String confirmNewPassword = "Senha@123";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("Password and password confirmation must be the same!", exception.getMessage());
 
         verify(userRepository, never())
                 .findByEmail(anyString());
