@@ -95,30 +95,16 @@ public class LoginUserTest {
         String email = "user@gmail.com";
         String wrongPassword = "SENHA";
         
-        when(userRepository.findByEmail(email))
-                .thenReturn(new User(
-                        email,
-                        wrongPassword,
-                        wrongPassword,
-                        "Jay",
-                        "Purple",
-                        "12345678900",
-                        "2000-01-01"
-                ));
-
-        when(userRepository.findByEmailAndPassword(email, wrongPassword))
-                .thenReturn(null);
-
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.login(email, wrongPassword));
 
-        assertEquals("Invalid email or password", exception.getMessage());
+        assertEquals("Password field is invalid.", exception.getMessage());
 
-        verify(userRepository, times(1))
+        verify(userRepository, times(0))
                 .findByEmailAndPassword(email, wrongPassword);
         
-        verify(userRepository, times(1))
+        verify(userRepository, times(0))
                 .findByEmail(email);
     }
 

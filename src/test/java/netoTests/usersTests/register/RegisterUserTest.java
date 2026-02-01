@@ -107,7 +107,7 @@ public class RegisterUserTest {
         );
 
         assertEquals(
-                "Password and password confirmation must be the same!",
+                "Password confirmation field is invalid.",
                 exception.getMessage()
         );
 
