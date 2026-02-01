@@ -9,8 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,8 +62,10 @@ public class LoginUserTest {
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.login(email, password));
+        
+        assertEquals("Email cannot be empty", exception.getMessage());
 
-        verify(userRepository, times(1))
-                .findByEmailAndPassword(email, password);
+        verify(userRepository, never())
+            .findByEmailAndPassword(anyString(), anyString());
     }
 }
