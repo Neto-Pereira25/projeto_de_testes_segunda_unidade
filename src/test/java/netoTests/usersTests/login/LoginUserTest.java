@@ -1,10 +1,12 @@
 package netoTests.usersTests.login;
 
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.services.LoginUserService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,17 +18,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class LoginUserTest {
+
     @Mock
     UserRepository userRepository;
 
     @InjectMocks
     LoginUserService service;
-    
+
     @Test
-    void testLoginUserWithValidCredentials(){
+    void testLoginUserWithValidCredentials() {
         String email = "user@gmail.com";
         String password = "Senh@123";
-        
+
         User user = new User(
                 email,
                 password,
@@ -36,14 +39,27 @@ public class LoginUserTest {
                 "12345678900",
                 "2000-01-01"
         );
-        
+
         when(userRepository.findByEmailAndPassword(email, password))
                 .thenReturn(user);
-        
+
         User loggedUser = service.login(email, password);
-        
+
         assertNotNull(loggedUser);
         assertEquals(email, loggedUser.getEmail());
+
+        verify(userRepository, times(1))
+                .findByEmailAndPassword(email, password);
+    }
+
+    @Test
+    void testLoginUserWithEmptyEmailField() {
+        String email = "";
+        String password = "Senh@123";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(email, password));
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(email, password);
