@@ -3,4 +3,7 @@ C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\j
 C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\exceptions\BusinessRuleException.java
 C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\repositories\UserRepository.java
 C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\services\LoginUserService.java
+C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\services\RecoverPasswordService.java
 C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\services\RegisterUserService.java
+C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\utils\EmailValidator.java
+C:\workspace\faculdade\periodo-5\testes\projetoDeTestesSegundaUnidade\src\main\java\com\teste\dsc\projetodetestessegundaunidade\utils\PasswordValidator.java

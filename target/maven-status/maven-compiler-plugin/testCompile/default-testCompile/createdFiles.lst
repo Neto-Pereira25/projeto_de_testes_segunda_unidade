@@ -1,2 +1,3 @@
 netoTests\usersTests\register\RegisterUserTest.class
+netoTests\usersTests\passwordRecovery\RecoverPasswordTest.class
 netoTests\usersTests\login\LoginUserTest.class

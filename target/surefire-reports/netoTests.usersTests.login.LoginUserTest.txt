@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: netoTests.usersTests.login.LoginUserTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.012 s -- in netoTests.usersTests.login.LoginUserTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.542 s -- in netoTests.usersTests.login.LoginUserTest

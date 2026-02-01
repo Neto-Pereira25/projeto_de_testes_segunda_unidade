@@ -1,6 +1,9 @@
-com\teste\dsc\projetodetestessegundaunidade\repositories\UserRepository.class
-com\teste\dsc\projetodetestessegundaunidade\services\RegisterUserService.class
 com\teste\dsc\projetodetestessegundaunidade\application\ProjetoDeTestesSegundaUnidade.class
 com\teste\dsc\projetodetestessegundaunidade\services\LoginUserService.class
-com\teste\dsc\projetodetestessegundaunidade\entities\User.class
 com\teste\dsc\projetodetestessegundaunidade\exceptions\BusinessRuleException.class
+com\teste\dsc\projetodetestessegundaunidade\utils\PasswordValidator.class
+com\teste\dsc\projetodetestessegundaunidade\utils\EmailValidator.class
+com\teste\dsc\projetodetestessegundaunidade\repositories\UserRepository.class
+com\teste\dsc\projetodetestessegundaunidade\services\RegisterUserService.class
+com\teste\dsc\projetodetestessegundaunidade\services\RecoverPasswordService.class
+com\teste\dsc\projetodetestessegundaunidade\entities\User.class
