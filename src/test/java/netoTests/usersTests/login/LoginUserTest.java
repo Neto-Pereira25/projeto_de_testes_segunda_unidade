@@ -28,7 +28,7 @@ public class LoginUserTest {
     LoginUserService service;
 
     @Test
-    void testLoginUserWithValidCredentials() {
+    public void testLoginUserWithValidCredentials() {
         String email = "user@gmail.com";
         String password = "Senh@123";
 
@@ -61,7 +61,7 @@ public class LoginUserTest {
     }
 
     @Test
-    void testLoginUserWithEmptyEmailField() {
+    public void testLoginUserWithEmptyEmailField() {
         String email = "";
         String password = "Senh@123";
 
@@ -76,7 +76,7 @@ public class LoginUserTest {
     }
 
     @Test
-    void testLoginUserWithEmptyPasswordField() {
+    public void testLoginUserWithEmptyPasswordField() {
         String email = "user@gmail.com";
         String password = "";
 
@@ -91,7 +91,7 @@ public class LoginUserTest {
     }
 
     @Test
-    void testNotLoginWhenPasswordIsIncorrect() {
+    public void testNotLoginWhenPasswordIsIncorrect() {
         String email = "user@gmail.com";
         String wrongPassword = "SENHA";
         
@@ -123,7 +123,7 @@ public class LoginUserTest {
     }
 
     @Test
-    void testNotLoginWhenEmailIsIncorrect() {
+    public void testNotLoginWhenEmailIsIncorrect() {
         String wrongEmail = "userErrado@gmail.com";
         String password = "Senh@123";
 
@@ -155,7 +155,7 @@ public class LoginUserTest {
     }
 
     @Test
-    void testNotLoginWhenEmailDoesNotExist() {
+    public void testNotLoginWhenEmailDoesNotExist() {
         String unregisteredEmail = "userInexistente@gmail.com";
         String password = "Senh@123";
 
