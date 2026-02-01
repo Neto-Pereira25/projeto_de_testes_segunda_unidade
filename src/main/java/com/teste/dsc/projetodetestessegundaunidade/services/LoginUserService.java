@@ -4,7 +4,6 @@ import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 
-
 public class LoginUserService {
 
     private final UserRepository userRepository;
@@ -17,11 +16,17 @@ public class LoginUserService {
         if (email == null || email.trim().isEmpty()) {
             throw new BusinessRuleException("Email cannot be empty");
         }
-        
+
         if (password == null || password.trim().isEmpty()) {
             throw new BusinessRuleException("Password cannot be empty");
         }
+        
+        User user = userRepository.findByEmailAndPassword(email, password);
 
-        return userRepository.findByEmailAndPassword(email, password);
+        if (user == null) {
+            throw new BusinessRuleException("Invalid email or password");
+        }
+
+        return user;
     }
 }
