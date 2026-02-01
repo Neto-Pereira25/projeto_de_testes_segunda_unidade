@@ -2,6 +2,7 @@ package netoTests.usersTests.passwordRecovery;
 
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.services.RecoverPasswordService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
