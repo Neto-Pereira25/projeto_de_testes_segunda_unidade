@@ -4,23 +4,22 @@
  */
 package HelenaTest;
 
-import org.junit.jupiter.api.Test ;
-    import org.junit.jupiter.api.extension.ExtendWith ;
+import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
+import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.services.RegisterUserService;
 
-    import org.mockito.ArgumentCaptor ;
-    import org.mockito.InjectMocks ;
-    import org.mockito.Mock ;
-    import org.mockito.junit.jupiter.MockitoExtension ;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-    import java.time.LocalDate ;
-    import java.util.UUID ;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-    import static org.junit.jupiter.api.Assertions.
-    *;
-    import static org.mockito.ArgumentMatchers.any ;
-    import static org.mockito.Mockito.
-
-    *;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -29,64 +28,71 @@ import org.junit.jupiter.api.Test ;
 @ExtendWith(MockitoExtension.class)
 public class CadastroUserTest {
 
-        @Mock
-        private UsuarioRepository usuarioRepository;
+    @Mock
+    private UserRepository userRepository;
 
-        @Mock
-        private PasswordHasher passwordHasher;
+    @InjectMocks
+    private RegisterUserService registerUserService;
 
-        @Mock
-        private CpfValidator cpfValidator;
+    @Test
+    void DeveCadastrarUsuarioDadosValidos() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento  = "01/01/1970";
 
-        @InjectMocks
-        private CadastroUsuarioService cadastroUsuarioService;
+        when(userRepository.saveUser(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0, User.class));
 
-        @Test
-        void DeveCadastrarUsuarioDadosValidos() {
-            var email = "user@gmail.com";
-            var senha = "Senh@123";
-            var confirmacaoSenha = "Senh@123"; 
-            var nome = "usuario";
-            var sobrenome = "silva";
-            var cpf = "12345678910";
-            var dataNascimento = LocalDate.of(1970, 1, 1);
+        User response = registerUserService.register(
+                email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+        );
 
-            var request = new CadastroUsuarioRequest(
+        assertNotNull(response);
+        assertEquals(nome, response.getName());
+        assertEquals(email, response.getEmail());
+        assertEquals(sobrenome, response.getSurname());
+        assertEquals(cpf, response.getCpf());
+        assertEquals(dataNascimento, response.getBirthDate());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(1)).saveUser(captor.capture());
+
+        User salvo = captor.getValue();
+        assertEquals(email, salvo.getEmail());
+        assertEquals(senha, salvo.getPassword());
+        assertEquals(confirmacaoSenha, salvo.getPasswordConfirmation());
+        assertEquals(nome, salvo.getName());
+        assertEquals(sobrenome, salvo.getSurname());
+        assertEquals(cpf, salvo.getCpf());
+        assertEquals(dataNascimento, salvo.getBirthDate());
+
+        verifyNoMoreInteractions(userRepository);
+    }
+    
+    @Test
+void DeveRecusarCadastroComEmailInvalido() {
+        String email = "usergmail.com";
+    String senha = "Senh@123";
+    String confirmacaoSenha = "Senh@123";
+    String nome = "usuario";
+    String sobrenome = "silva";
+    String cpf = "12345678910";
+    String dataNascimento = "01/01/1970";
+
+ 
+    BusinessRuleException ex = assertThrows(
+            BusinessRuleException.class,
+            () -> registerUserService.register(
                     email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
-            );
+            )
+    );
 
-            when(usuarioRepository.existePorEmail(email)).thenReturn(false);
-            when(usuarioRepository.existePorCpf(cpf)).thenReturn(false);
-            when(cpfValidator.isValid(cpf)).thenReturn(true);
-            when(passwordHasher.hash(senha)).thenReturn("HASHED_123");
+    assertEquals("Invalid email", ex.getMessage());
+    verify(userRepository, never()).saveUser(any());
+}
 
-            when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
-                Usuario u = inv.getArgument(0);
-                u.setId(UUID.randomUUID());
-                return u;
-            });
-
-            CadastroUsuarioResponse response = cadastroUsuarioService.cadastrar(request);
-
-            assertTrue(response.sucesso());
-            assertEquals("Cadastro realizado com sucesso.", response.mensagem());
-            assertNotNull(response.usuarioId());
-
-            ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
-            verify(usuarioRepository).save(captor.capture());
-
-            Usuario salvo = captor.getValue();
-            assertEquals(email, salvo.getEmail());
-            assertEquals(nome, salvo.getNome());
-            assertEquals(sobrenome, salvo.getSobrenome());
-            assertEquals("HASHED_123", salvo.getSenhaHash());
-            assertEquals(cpf, salvo.getCpf());
-            assertEquals(dataNascimento, salvo.getDataNascimento());
-
-            // Verifica o fluxo
-            verify(usuarioRepository).existePorEmail(email);
-            verify(usuarioRepository).existePorCpf(cpf);
-            verify(cpfValidator).isValid(cpf);
-            verify(passwordHasher).hash(senha);
-        }
 }
