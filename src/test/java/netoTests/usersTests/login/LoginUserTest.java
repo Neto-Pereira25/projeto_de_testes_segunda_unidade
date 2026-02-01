@@ -87,7 +87,7 @@ public class LoginUserTest {
     @Test
     void testNotLoginWhenPasswordIsIncorrect() {
         String email = "user@gmail.com";
-        String wrongPassword = "wrongPassword";
+        String wrongPassword = "SENHA";
 
         when(userRepository.findByEmailAndPassword(email, wrongPassword))
                 .thenReturn(null);
@@ -100,5 +100,23 @@ public class LoginUserTest {
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(email, wrongPassword);
+    }
+
+    @Test
+    void testNotLoginWhenEmailIsIncorrect() {
+        String wrongEmail = "userErrado@gmail.com";
+        String password = "Senh@123";
+
+        when(userRepository.findByEmailAndPassword(wrongEmail, password))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(wrongEmail, password));
+
+        assertEquals("Invalid email or password", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmailAndPassword(wrongEmail, password);
     }
 }
