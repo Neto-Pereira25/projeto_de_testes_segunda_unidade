@@ -4,6 +4,7 @@ import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.utils.EmailValidator;
+import com.teste.dsc.projetodetestessegundaunidade.utils.PasswordValidator;
 
 public class RecoverPasswordService {
 
@@ -28,7 +29,15 @@ public class RecoverPasswordService {
         }
 
         if (!EmailValidator.isValid(email)) {
-            throw new BusinessRuleException("Email field is invalid");
+            throw new BusinessRuleException("Email field is invalid.");
+        }
+
+        if (!EmailValidator.isValid(newPassword)) {
+            throw new BusinessRuleException("New Password field is invalid.");
+        }
+
+        if (!PasswordValidator.isValid(confirmNewPassword)) {
+            throw new BusinessRuleException("Confirm New Password field is invalid.");
         }
 
         if (!newPassword.equals(confirmNewPassword)) {

@@ -101,14 +101,14 @@ public class RecoverPasswordTest {
                 BusinessRuleException.class,
                 () -> service.recover(email, newPassword, confirmNewPassword));
 
-        assertEquals("Email field is invalid", exception.getMessage());
+        assertEquals("Email field is invalid.", exception.getMessage());
 
         verify(userRepository, never())
                 .findByEmail(anyString());
     }
     
     @Test
-    public void testRecoveryPasswordWithDifferentPasswordAndPasswordConfirmationFields() {
+    public void testRecoveryPasswordWithInvalidPassword() {
         String email = "user@gmail.com";
         String newPassword = "Senha";
         String confirmNewPassword = "Senha@123";
@@ -117,17 +117,33 @@ public class RecoverPasswordTest {
                 BusinessRuleException.class,
                 () -> service.recover(email, newPassword, confirmNewPassword));
 
-        assertEquals("Password and password confirmation must be the same!", exception.getMessage());
+        assertEquals("New Password field is invalid.", exception.getMessage());
 
         verify(userRepository, never())
                 .findByEmail(anyString());
     }
     
     @Test
-    public void testRecoveryPasswordWithDifferentPasswordConfirmationFieldsAndPassword() {
+    public void testRecoveryPasswordWithInvalidPasswordConfirmationFields() {
         String email = "user@gmail.com";
         String newPassword = "Senha@123";
         String confirmNewPassword = "Senha";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("Confirm New Password field is invalid.", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmail(anyString());
+    }
+    
+    @Test
+    public void testRecoveryPasswordWithDifferentPasswordAndPasswordConfirmationFields() {
+        String email = "user@gmail.com";
+        String newPassword = "Senha@123";
+        String confirmNewPassword = "Senha@1234";
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
