@@ -2,6 +2,7 @@ package netoTests.usersTests.login;
 
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.services.LoginUserService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ public class LoginUserTest {
         when(userRepository.findByEmailAndPassword(email, password))
                 .thenReturn(user);
         
-        User loggedUser = loginUserService.login(email, password);
+        User loggedUser = service.login(email, password);
         
         assertNotNull(loggedUser);
         assertEquals(email, loggedUser.getEmail());
