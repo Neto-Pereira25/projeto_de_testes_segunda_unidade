@@ -1,0 +1,50 @@
+package netoTests.usersTests.login;
+
+import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+public class LoginUserTest {
+    @Mock
+    UserRepository userRepository;
+
+    @InjectMocks
+    LoginUserService service;
+    
+    @Test
+    void testLoginUserWithValidCredentials(){
+        String email = "user@gmail.com";
+        String password = "Senh@123";
+        
+        User user = new User(
+                email,
+                password,
+                password,
+                "Jay",
+                "Purple",
+                "12345678900",
+                "2000-01-01"
+        );
+        
+        when(userRepository.findByEmailAndPassword(email, password))
+                .thenReturn(user);
+        
+        User loggedUser = loginUserService.login(email, password);
+        
+        assertNotNull(loggedUser);
+        assertEquals(email, loggedUser.getEmail());
+
+        verify(userRepository, times(1))
+                .findByEmailAndPassword(email, password);
+    }
+}
