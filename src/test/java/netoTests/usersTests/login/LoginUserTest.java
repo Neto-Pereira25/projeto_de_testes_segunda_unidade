@@ -68,4 +68,19 @@ public class LoginUserTest {
         verify(userRepository, never())
             .findByEmailAndPassword(anyString(), anyString());
     }
+    
+    @Test
+    void testLoginUserWithEmptyPasswordField() {
+        String email = "user@gmail.com";
+        String password = "";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(email, password));
+        
+        assertEquals("Password cannot be empty", exception.getMessage());
+
+        verify(userRepository, never())
+            .findByEmailAndPassword(anyString(), anyString());
+    }
 }
