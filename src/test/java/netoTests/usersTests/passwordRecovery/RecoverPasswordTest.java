@@ -88,7 +88,7 @@ public class RecoverPasswordTest {
         assertEquals("Email cannot be empty", exception.getMessage());
 
         verify(userRepository, never())
-                .findByEmailAndPassword(anyString(), anyString());
+                .findByEmail(anyString());
     }
     
     @Test
@@ -104,6 +104,6 @@ public class RecoverPasswordTest {
         assertEquals("Email field is invalid", exception.getMessage());
 
         verify(userRepository, never())
-                .findByEmailAndPassword(anyString(), anyString());
+                .findByEmail(anyString());
     }
 }

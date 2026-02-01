@@ -3,6 +3,7 @@ package com.teste.dsc.projetodetestessegundaunidade.services;
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.utils.EmailValidator;
 
 public class RecoverPasswordService {
     private final UserRepository userRepository;
@@ -23,6 +24,10 @@ public class RecoverPasswordService {
 
         if (confirmNewPassword == null || confirmNewPassword.trim().isEmpty()) {
             throw new BusinessRuleException("Confirm new password cannot be empty");
+        }
+        
+        if (!EmailValidator.isValid(email)){
+            throw new BusinessRuleException("Email field is invalid");
         }
         
         User user = userRepository.findByEmail(email);
