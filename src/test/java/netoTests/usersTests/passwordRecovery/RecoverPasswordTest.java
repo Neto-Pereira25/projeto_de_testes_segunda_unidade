@@ -110,8 +110,24 @@ public class RecoverPasswordTest {
     @Test
     public void testRecoveryPasswordWithDifferentPasswordAndPasswordConfirmationFields() {
         String email = "user@gmail.com";
-        String newPassword = "SENHA";
+        String newPassword = "Senha";
         String confirmNewPassword = "Senha@123";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("Password and password confirmation must be the same!", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmail(anyString());
+    }
+    
+    @Test
+    public void testRecoveryPasswordWithDifferentPasswordConfirmationFieldsAndPassword() {
+        String email = "user@gmail.com";
+        String newPassword = "Senha@123";
+        String confirmNewPassword = "Senha";
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
