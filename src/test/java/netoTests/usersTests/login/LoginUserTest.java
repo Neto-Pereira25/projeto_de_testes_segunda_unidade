@@ -62,13 +62,13 @@ public class LoginUserTest {
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.login(email, password));
-        
+
         assertEquals("Email cannot be empty", exception.getMessage());
 
         verify(userRepository, never())
-            .findByEmailAndPassword(anyString(), anyString());
+                .findByEmailAndPassword(anyString(), anyString());
     }
-    
+
     @Test
     void testLoginUserWithEmptyPasswordField() {
         String email = "user@gmail.com";
@@ -77,10 +77,28 @@ public class LoginUserTest {
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.login(email, password));
-        
+
         assertEquals("Password cannot be empty", exception.getMessage());
 
         verify(userRepository, never())
-            .findByEmailAndPassword(anyString(), anyString());
+                .findByEmailAndPassword(anyString(), anyString());
+    }
+
+    @Test
+    void testNotLoginWhenPasswordIsIncorrect() {
+        String email = "user@gmail.com";
+        String wrongPassword = "wrongPassword";
+
+        when(userRepository.findByEmailAndPassword(email, wrongPassword))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(email, wrongPassword));
+
+        assertEquals("Invalid email or password", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmailAndPassword(email, wrongPassword);
     }
 }
