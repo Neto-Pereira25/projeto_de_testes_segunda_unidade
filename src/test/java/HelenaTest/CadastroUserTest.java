@@ -42,7 +42,7 @@ public class CadastroUserTest {
         String nome = "usuario";
         String sobrenome = "silva";
         String cpf = "12345678910";
-        String dataNascimento  = "01/01/1970";
+        String dataNascimento = "01/01/1970";
 
         when(userRepository.saveUser(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0, User.class));
@@ -72,27 +72,47 @@ public class CadastroUserTest {
 
         verifyNoMoreInteractions(userRepository);
     }
-    
+
     @Test
-void DeveRecusarCadastroComEmailInvalido() {
+    void DeveRecusarCadastroComEmailInvalido() {
         String email = "usergmail.com";
-    String senha = "Senh@123";
-    String confirmacaoSenha = "Senh@123";
-    String nome = "usuario";
-    String sobrenome = "silva";
-    String cpf = "12345678910";
-    String dataNascimento = "01/01/1970";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
 
- 
-    BusinessRuleException ex = assertThrows(
-            BusinessRuleException.class,
-            () -> registerUserService.register(
-                    email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
-            )
-    );
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
 
-    assertEquals("Invalid email", ex.getMessage());
-    verify(userRepository, never()).saveUser(any());
-}
+        assertEquals("Invalid email", ex.getMessage());
+        verify(userRepository, never()).saveUser(any());
+    }
+
+    @Test
+    void DeveRecusarCadastroComEmailVazio() {
+        String email = "";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo e-mail precisa ser preenchido.", ex.getMessage());
+        verify(userRepository, never()).saveUser(any());
+    }
 
 }

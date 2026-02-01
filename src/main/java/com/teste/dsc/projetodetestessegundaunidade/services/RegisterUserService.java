@@ -29,18 +29,17 @@ public class RegisterUserService {
             String surname,
             String cpf,
             String birthDate) {
-        
+
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
         
-        validateEmail(email);
         if (!PasswordValidator.isValid(password)) {
             throw new BusinessRuleException("Password field is invalid.");
         }
-        
+
         if (!PasswordValidator.isValid(passwordConfirmation)) {
             throw new BusinessRuleException("Password confirmation field is invalid.");
         }
-        
+
         if (!EmailValidator.isValid(email)) {
             throw new BusinessRuleException("Email field is invalid.");
         }
@@ -63,6 +62,9 @@ public class RegisterUserService {
             String surname,
             String cpf,
             String birthDate) {
+        if (email == null || email.isBlank()) {
+            throw new BusinessRuleException("Campo e-mail precisa ser preenchido.");
+        }
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
@@ -74,13 +76,13 @@ public class RegisterUserService {
             throw new BusinessRuleException("Invalid required fields");
         }
     }
-    
+
     private void validateEmail(String email) {
-    // exige algo@algo.algo (sem espaços)
-    String regex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
-    if (!email.matches(regex)) {
-        throw new BusinessRuleException("Invalid email");
-    }
+        // exige algo@algo.algo (sem espaços)
+        String regex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
+        if (!email.matches(regex)) {
+            throw new BusinessRuleException("Invalid email");
+        }
     }
 
 }
