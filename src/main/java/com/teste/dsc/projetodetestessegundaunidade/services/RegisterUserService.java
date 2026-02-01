@@ -7,6 +7,8 @@ package com.teste.dsc.projetodetestessegundaunidade.services;
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.utils.EmailValidator;
+import com.teste.dsc.projetodetestessegundaunidade.utils.PasswordValidator;
 
 /**
  *
@@ -31,6 +33,17 @@ public class RegisterUserService {
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
         
         validateEmail(email);
+        if (!PasswordValidator.isValid(password)) {
+            throw new BusinessRuleException("Password field is invalid.");
+        }
+        
+        if (!PasswordValidator.isValid(passwordConfirmation)) {
+            throw new BusinessRuleException("Password confirmation field is invalid.");
+        }
+        
+        if (!EmailValidator.isValid(email)) {
+            throw new BusinessRuleException("Email field is invalid.");
+        }
 
         if (!password.equals(passwordConfirmation)) {
             throw new BusinessRuleException("Password and password confirmation must be the same!");

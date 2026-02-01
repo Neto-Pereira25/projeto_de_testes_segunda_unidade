@@ -28,7 +28,7 @@ public class LoginUserTest {
     LoginUserService service;
 
     @Test
-    void testLoginUserWithValidCredentials() {
+    public void testLoginUserWithValidCredentials() {
         String email = "user@gmail.com";
         String password = "Senh@123";
 
@@ -42,6 +42,9 @@ public class LoginUserTest {
                 "2000-01-01"
         );
 
+        when(userRepository.findByEmail(email))
+                .thenReturn(user);
+
         when(userRepository.findByEmailAndPassword(email, password))
                 .thenReturn(user);
 
@@ -52,20 +55,106 @@ public class LoginUserTest {
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(email, password);
+
+        verify(userRepository, times(1))
+                .findByEmail(email);
     }
 
     @Test
-    void testLoginUserWithEmptyEmailField() {
+    public void testLoginUserWithEmptyEmailField() {
         String email = "";
         String password = "Senh@123";
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.login(email, password));
-        
+
         assertEquals("Email cannot be empty", exception.getMessage());
 
         verify(userRepository, never())
-            .findByEmailAndPassword(anyString(), anyString());
+                .findByEmailAndPassword(anyString(), anyString());
+    }
+
+    @Test
+    public void testLoginUserWithEmptyPasswordField() {
+        String email = "user@gmail.com";
+        String password = "";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(email, password));
+
+        assertEquals("Password cannot be empty", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmailAndPassword(anyString(), anyString());
+    }
+
+    @Test
+    public void testNotLoginWhenPasswordIsIncorrect() {
+        String email = "user@gmail.com";
+        String wrongPassword = "SENHA";
+        
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(email, wrongPassword));
+
+        assertEquals("Password field is invalid.", exception.getMessage());
+
+        verify(userRepository, times(0))
+                .findByEmailAndPassword(email, wrongPassword);
+        
+        verify(userRepository, times(0))
+                .findByEmail(email);
+    }
+
+    @Test
+    public void testNotLoginWhenEmailIsIncorrect() {
+        String wrongEmail = "userErrado@gmail.com";
+        String password = "Senh@123";
+
+        when(userRepository.findByEmail(wrongEmail))
+                .thenReturn(new User(
+                        wrongEmail,
+                        password,
+                        password,
+                        "Jay",
+                        "Purple",
+                        "12345678900",
+                        "2000-01-01"
+                ));
+
+        when(userRepository.findByEmailAndPassword(wrongEmail, password))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(wrongEmail, password));
+
+        assertEquals("Invalid email or password", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmailAndPassword(wrongEmail, password);
+
+        verify(userRepository, times(1))
+                .findByEmail(wrongEmail);
+    }
+
+    @Test
+    public void testNotLoginWhenEmailDoesNotExist() {
+        String unregisteredEmail = "userInexistente@gmail.com";
+        String password = "Senh@123";
+
+        when(userRepository.findByEmail(unregisteredEmail))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(unregisteredEmail, password));
+
+        assertEquals("This email address is not registered.", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmail(unregisteredEmail);
     }
 }

@@ -36,7 +36,7 @@ public class RegisterUserTest {
     RegisterUserService service;
 
     @Test
-    void testRegisterUserWithValidFields() {
+    public void testRegisterUserWithValidFields() {
         User user = new User(
                 "user@gmail.com",
                 "Senh@123",
@@ -69,7 +69,7 @@ public class RegisterUserTest {
     }
 
     @Test
-    void testRegisterUserWithDifferentPasswordAndPasswordConfirmationFields() {
+    public void testRegisterUserWithDifferentPasswordAndPasswordConfirmationFields() {
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.register(
@@ -92,7 +92,7 @@ public class RegisterUserTest {
     }
 
     @Test
-    void testRegisterUserWithEmptyPasswordConfirmationField() {
+    public void testRegisterUserWithEmptyPasswordConfirmationField() {
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.register(
@@ -107,7 +107,7 @@ public class RegisterUserTest {
         );
 
         assertEquals(
-                "Password and password confirmation must be the same!",
+                "Password confirmation field is invalid.",
                 exception.getMessage()
         );
 
