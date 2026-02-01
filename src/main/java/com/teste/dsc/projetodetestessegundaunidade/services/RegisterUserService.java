@@ -31,7 +31,11 @@ public class RegisterUserService {
             String birthDate) {
 
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
-        
+
+        if (userRepository.existsByEmail(email)) {
+            throw new BusinessRuleException("O e-mail informado já possui cadastro.");
+        }
+
         if (!PasswordValidator.isValid(password)) {
             throw new BusinessRuleException("Password field is invalid.");
         }
