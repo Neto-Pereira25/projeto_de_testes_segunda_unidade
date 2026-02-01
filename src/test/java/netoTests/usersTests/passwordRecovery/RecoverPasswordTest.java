@@ -90,4 +90,20 @@ public class RecoverPasswordTest {
         verify(userRepository, never())
                 .findByEmailAndPassword(anyString(), anyString());
     }
+    
+    @Test
+    public void testLoginUserWithInvalidEmailField() {
+        String email = "email-invalido#gmail.com";
+        String newPassword = "Senha@123";
+        String confirmNewPassword = "Senha@123";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("Email field is invalid", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmailAndPassword(anyString(), anyString());
+    }
 }
