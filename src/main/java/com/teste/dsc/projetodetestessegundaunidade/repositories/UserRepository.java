@@ -6,4 +6,6 @@ public interface UserRepository {
     User saveUser(User user);
     
     User findByEmailAndPassword(String email, String password);
+    
+    User findByEmail(String email);
 }

@@ -21,6 +21,12 @@ public class LoginUserService {
             throw new BusinessRuleException("Password cannot be empty");
         }
         
+        User userFound = userRepository.findByEmail(email);
+        
+        if (userFound == null){
+            throw new BusinessRuleException("This email address is not registered.");
+        }
+        
         User user = userRepository.findByEmailAndPassword(email, password);
 
         if (user == null) {

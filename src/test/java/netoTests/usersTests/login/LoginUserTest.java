@@ -42,6 +42,9 @@ public class LoginUserTest {
                 "2000-01-01"
         );
 
+        when(userRepository.findByEmail(email))
+                .thenReturn(user);
+
         when(userRepository.findByEmailAndPassword(email, password))
                 .thenReturn(user);
 
@@ -52,6 +55,9 @@ public class LoginUserTest {
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(email, password);
+
+        verify(userRepository, times(1))
+                .findByEmail(email);
     }
 
     @Test
@@ -88,6 +94,17 @@ public class LoginUserTest {
     void testNotLoginWhenPasswordIsIncorrect() {
         String email = "user@gmail.com";
         String wrongPassword = "SENHA";
+        
+        when(userRepository.findByEmail(email))
+                .thenReturn(new User(
+                        email,
+                        wrongPassword,
+                        wrongPassword,
+                        "Jay",
+                        "Purple",
+                        "12345678900",
+                        "2000-01-01"
+                ));
 
         when(userRepository.findByEmailAndPassword(email, wrongPassword))
                 .thenReturn(null);
@@ -100,12 +117,26 @@ public class LoginUserTest {
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(email, wrongPassword);
+        
+        verify(userRepository, times(1))
+                .findByEmail(email);
     }
 
     @Test
     void testNotLoginWhenEmailIsIncorrect() {
         String wrongEmail = "userErrado@gmail.com";
         String password = "Senh@123";
+
+        when(userRepository.findByEmail(wrongEmail))
+                .thenReturn(new User(
+                        wrongEmail,
+                        password,
+                        password,
+                        "Jay",
+                        "Purple",
+                        "12345678900",
+                        "2000-01-01"
+                ));
 
         when(userRepository.findByEmailAndPassword(wrongEmail, password))
                 .thenReturn(null);
@@ -118,5 +149,26 @@ public class LoginUserTest {
 
         verify(userRepository, times(1))
                 .findByEmailAndPassword(wrongEmail, password);
+
+        verify(userRepository, times(1))
+                .findByEmail(wrongEmail);
+    }
+
+    @Test
+    void testNotLoginWhenEmailDoesNotExist() {
+        String unregisteredEmail = "userInexistente@gmail.com";
+        String password = "Senh@123";
+
+        when(userRepository.findByEmail(unregisteredEmail))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.login(unregisteredEmail, password));
+
+        assertEquals("This email address is not registered.", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmail(unregisteredEmail);
     }
 }
