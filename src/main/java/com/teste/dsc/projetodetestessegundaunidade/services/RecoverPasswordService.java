@@ -6,6 +6,7 @@ import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.utils.EmailValidator;
 
 public class RecoverPasswordService {
+
     private final UserRepository userRepository;
 
     public RecoverPasswordService(UserRepository userRepository) {
@@ -13,7 +14,7 @@ public class RecoverPasswordService {
     }
 
     public User recover(String email, String newPassword, String confirmNewPassword) {
-        
+
         if (email == null || email.trim().isEmpty()) {
             throw new BusinessRuleException("Email cannot be empty");
         }
@@ -25,20 +26,24 @@ public class RecoverPasswordService {
         if (confirmNewPassword == null || confirmNewPassword.trim().isEmpty()) {
             throw new BusinessRuleException("Confirm new password cannot be empty");
         }
-        
-        if (!EmailValidator.isValid(email)){
+
+        if (!EmailValidator.isValid(email)) {
             throw new BusinessRuleException("Email field is invalid");
         }
-        
+
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new BusinessRuleException("Password and password confirmation must be the same!");
+        }
+
         User user = userRepository.findByEmail(email);
-        
+
         if (user == null) {
             throw new BusinessRuleException("This email address is not registered.");
         }
-        
+
         user.setPassword(newPassword);
         user.setPasswordConfirmation(confirmNewPassword);
-        
+
         return user;
     }
 }
