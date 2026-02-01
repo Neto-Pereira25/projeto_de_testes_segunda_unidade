@@ -154,4 +154,20 @@ public class RecoverPasswordTest {
         verify(userRepository, never())
                 .findByEmail(anyString());
     }
+    
+    @Test
+    public void testRecoveryPasswordWithWithEmptyNewPasswordField() {
+        String email = "user@gmail.com";
+        String newPassword = "";
+        String confirmNewPassword = "Senha@1234";
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(email, newPassword, confirmNewPassword));
+
+        assertEquals("New password cannot be empty", exception.getMessage());
+
+        verify(userRepository, never())
+                .findByEmail(anyString());
+    }
 }
