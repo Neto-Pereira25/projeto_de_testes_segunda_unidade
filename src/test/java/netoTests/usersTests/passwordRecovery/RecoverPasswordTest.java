@@ -1,10 +1,12 @@
 package netoTests.usersTests.passwordRecovery;
 
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
+import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.services.RecoverPasswordService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,5 +52,24 @@ public class RecoverPasswordTest {
 
         verify(userRepository, times(1))
                 .findByEmail(email);
+    }
+    
+    @Test
+    public void testNotRecoveryPasswordWhenEmailDoesNotExist() {
+        String unregisteredEmail = "userInexistente@gmail.com";
+        String newPassword = "Senha@123";
+        String confirmNewPassword = "Senha@123";
+
+        when(userRepository.findByEmail(unregisteredEmail))
+                .thenReturn(null);
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.recover(unregisteredEmail, newPassword, confirmNewPassword));
+
+        assertEquals("This email address is not registered.", exception.getMessage());
+
+        verify(userRepository, times(1))
+                .findByEmail(unregisteredEmail);
     }
 }
