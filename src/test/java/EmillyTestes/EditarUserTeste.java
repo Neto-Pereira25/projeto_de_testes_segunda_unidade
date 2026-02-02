@@ -190,5 +190,116 @@ public class EditarUserTeste {
 
         verify(userRepository, never()).saveUser(any(User.class));
     }
+    @Test
+    void TC_039_atualizarPerfil_emailVazio_deveFalharENaoSalvar() {
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String emailVazio = "";
+        String novaSenha = "NovaSenha@123";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfile(
+                        emailAtual, senhaAtual,
+                        emailVazio, novaSenha,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_040_atualizarPerfil_enderecoVazio_deveFalharENaoSalvar() {
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String novoEmail = "user@gmail.com";
+        String novaSenha = "NovaSenha@123";
+
+        String enderecoVazio = "";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfile(
+                        emailAtual, senhaAtual,
+                        novoEmail, novaSenha,
+                        enderecoVazio, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_041_atualizarPerfil_numeroVazio_deveFalharENaoSalvar() {
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String novoEmail = "user@gmail.com";
+        String novaSenha = "NovaSenha@123";
+
+        String endereco = "Rua dos bobos";
+        int numeroVazio = -1; // sentinela para "não preenchido"
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfile(
+                        emailAtual, senhaAtual,
+                        novoEmail, novaSenha,
+                        endereco, numeroVazio, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_042_atualizarPerfil_cepVazio_deveFalharENaoSalvar() {
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String novoEmail = "user@gmail.com";
+        String novaSenha = "NovaSenha@123";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cepVazio = "";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfile(
+                        emailAtual, senhaAtual,
+                        novoEmail, novaSenha,
+                        endereco, numero, cepVazio, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
 
 }
