@@ -251,10 +251,10 @@ public class CadastroUserTest {
     void DeveRecusarCadastroComCpfVazio() {
         String email = "user@gmail.com";
         String senha = "Senh@123";
-        String confirmacaoSenha = "Senh@123"; 
+        String confirmacaoSenha = "Senh@123";
         String nome = "usuario";
         String sobrenome = "silva";
-        String cpf = "";                     
+        String cpf = "";
         String dataNascimento = "01/01/1970";
 
         BusinessRuleException ex = assertThrows(
@@ -265,6 +265,27 @@ public class CadastroUserTest {
         );
 
         assertEquals("Campo cpf está vazio.", ex.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComDataNascimentoVazia() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123"; 
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = ""; 
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo data de nascimento está vazio.", ex.getMessage());
         verifyNoInteractions(userRepository);
     }
 
