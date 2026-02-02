@@ -121,8 +121,10 @@ public class CadastroUserComCodigoTest {
 
         assertEquals("Código inválido.", ex.getMessage());
 
+        verify(pendingStore).findByEmail(email);
         verify(userRepository, never()).saveUser(any());
         verify(pendingStore, never()).delete(anyString());
+        verifyNoMoreInteractions(userRepository, pendingStore);
     }
 
 }
