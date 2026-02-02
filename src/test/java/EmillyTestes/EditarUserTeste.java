@@ -4,6 +4,7 @@ import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
 import com.teste.dsc.projetodetestessegundaunidade.services.EditUserService;
+import com.teste.dsc.projetodetestessegundaunidade.services.VerificationCodeService;
 import com.teste.dsc.projetodetestessegundaunidade.utils.EmailValidator;
 import com.teste.dsc.projetodetestessegundaunidade.utils.PasswordValidator;
 
@@ -23,27 +24,37 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ *
+ * @author Emilly Maria
+ */
 @ExtendWith(MockitoExtension.class)
 public class EditarUserTeste {
 
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private VerificationCodeService verificationCodeService;
+
     private EditUserService editUserService;
 
     @BeforeEach
     void setup() {
-        // Validators reais (Mockito não consegue mockar EmailValidator no seu projeto)
-        editUserService = new EditUserService(userRepository, new EmailValidator(), new PasswordValidator());
+        
+        editUserService = new EditUserService(
+                userRepository,
+                new EmailValidator(),
+                new PasswordValidator(),
+                verificationCodeService
+        );
     }
 
     @Test
     void TC_035_atualizarPerfil_usuarioAutenticado_comCamposPreenchidos() {
-        // Dados do TC_035
         String email = "user@gmail.com";
         String senhaAtual = "SenhaAtual@123";
 
-        // Na planilha aparece ******** (mascarado), aqui usamos uma senha válida pro validator
         String novaSenha = "NovaSenha@123";
 
         String endereco = "Rua dos bobos";
@@ -55,14 +66,12 @@ public class EditarUserTeste {
         User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
         when(userRepository.findByEmailAndPassword(email, senhaAtual)).thenReturn(userLogado);
 
-        // Act
         editUserService.updateProfile(
                 email, senhaAtual,
                 email, novaSenha,
                 endereco, numero, cep, complemento, pontoRef
         );
 
-        // Assert
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).saveUser(captor.capture());
 
@@ -80,14 +89,10 @@ public class EditarUserTeste {
 
     @Test
     void TC_036_atualizarPerfil_emailInvalido_deveFalharENaoSalvar() {
-        // Dados do TC_036
         String emailAtual = "user@gmail.com";
         String senhaAtual = "SenhaAtual@123";
 
-        // Email inválido (sem @) conforme cenário
         String emailInvalido = "usergmail.com";
-
-        // Senha válida pro validator
         String novaSenha = "NovaSenha@123";
 
         String endereco = "Rua dos bobos";
@@ -99,7 +104,6 @@ public class EditarUserTeste {
         User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
         when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
 
-        // Act + Assert (deve lançar exceção)
         assertThrows(BusinessRuleException.class, () ->
                 editUserService.updateProfile(
                         emailAtual, senhaAtual,
@@ -108,7 +112,83 @@ public class EditarUserTeste {
                 )
         );
 
-        // Não pode salvar
         verify(userRepository, never()).saveUser(any(User.class));
     }
+
+    @Test
+    void TC_037_atualizarEmail_comCodigo_valido_deveAtualizarESalvar() {
+        // Dados do TC_037
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String novoEmail = "useratualizado@gmail.com"; 
+        String codigoDigitado = "123456";             
+        String novaSenha = "NovaSenha@123";            
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+        when(verificationCodeService.sendCode(novoEmail)).thenReturn(codigoDigitado);
+        when(verificationCodeService.isValid(novoEmail, codigoDigitado)).thenReturn(true);
+
+        editUserService.updateEmailWithCode(
+                emailAtual, senhaAtual,
+                novoEmail, codigoDigitado,
+                novaSenha,
+                endereco, numero, cep, complemento, pontoRef
+        );
+
+        verify(verificationCodeService).sendCode(novoEmail);
+        verify(verificationCodeService).isValid(novoEmail, codigoDigitado);
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveUser(captor.capture());
+
+        User salvo = captor.getValue();
+        assertEquals(novoEmail, salvo.getEmail());
+    }
+    
+    @Test
+    void TC_038_atualizarEmail_comCodigo_incorreto_deveFalharENaoSalvar() {
+        String emailAtual = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+
+        String novoEmail = "userdeoutrapessoa@gmail.com"; 
+        String codigoCorreto = "123456";                  
+        String codigoIncorreto = "000000";                
+        String novaSenha = "NovaSenha@123";              
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(emailAtual, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+
+        when(userRepository.findByEmailAndPassword(emailAtual, senhaAtual)).thenReturn(userLogado);
+        when(verificationCodeService.sendCode(novoEmail)).thenReturn(codigoCorreto);
+        when(verificationCodeService.isValid(novoEmail, codigoIncorreto)).thenReturn(false);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateEmailWithCode(
+                        emailAtual, senhaAtual,
+                        novoEmail, codigoIncorreto,
+                        novaSenha,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(verificationCodeService).sendCode(novoEmail);
+        verify(verificationCodeService).isValid(novoEmail, codigoIncorreto);
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
 }
