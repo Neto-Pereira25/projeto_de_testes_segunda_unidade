@@ -32,20 +32,25 @@ public class RegisterUserService {
 
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
+        validateName(name);
+        validateSurname(surname);
+        validateCpf(cpf);
+
+        if (!EmailValidator.isValid(email)) {
+            throw new BusinessRuleException("Email field is invalid.");
+        }
+
         if (userRepository.existsByEmail(email)) {
             throw new BusinessRuleException("O e-mail informado já possui cadastro.");
         }
 
-        if (!PasswordValidator.isValid(password)) {
+        if (password == null || password.isBlank() || !PasswordValidator.isValid(password)) {
             throw new BusinessRuleException("Password field is invalid.");
         }
 
-        if (!PasswordValidator.isValid(passwordConfirmation)) {
+        if (passwordConfirmation == null || passwordConfirmation.isBlank()
+                || !PasswordValidator.isValid(passwordConfirmation)) {
             throw new BusinessRuleException("Password confirmation field is invalid.");
-        }
-
-        if (!EmailValidator.isValid(email)) {
-            throw new BusinessRuleException("Email field is invalid.");
         }
 
         if (!password.equals(passwordConfirmation)) {
@@ -69,15 +74,64 @@ public class RegisterUserService {
         if (email == null || email.isBlank()) {
             throw new BusinessRuleException("Campo e-mail precisa ser preenchido.");
         }
+
+        if (name == null || name.isBlank()) {
+            throw new BusinessRuleException("Campo nome está vazio.");
+        }
+
+        if (surname == null || surname.isBlank()) {
+            throw new BusinessRuleException("Campo sobrenome está vazio.");
+        }
+
+        if (cpf == null || cpf.isBlank()) {
+            throw new BusinessRuleException("Campo cpf está vazio.");
+        }
+
+        if (birthDate == null || birthDate.isBlank()) {
+            throw new BusinessRuleException("Campo data de nascimento está vazio.");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new BusinessRuleException("Campo senha está vazio.");
+        }
+
+        if (!PasswordValidator.isValid(password)) {
+            throw new BusinessRuleException(
+                    "precisa conter caracteres maiúsculos, minúsculos, numéricos e especiais com limite mínimo de 8 e máximo de 32"
+            );
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
                 || cpf == null || cpf.isBlank()
-                || password == null || password.isBlank()
-                || passwordConfirmation == null || passwordConfirmation.isBlank()
                 || birthDate == null || birthDate.isBlank()) {
 
             throw new BusinessRuleException("Invalid required fields");
+        }
+    }
+
+    private void validateName(String name) {
+        String regex = "^[\\p{L} ]+$";
+        if (!name.matches(regex)) {
+            throw new BusinessRuleException("Campo nome possui caracteres inválidos.");
+        }
+    }
+
+    private void validateSurname(String surname) {
+        String regex = "^[\\p{L} ]+$";
+        if (!surname.matches(regex)) {
+            throw new BusinessRuleException("Campo sobrenome possui caracteres inválidos.");
+        }
+    }
+
+    private void validateCpf(String cpf) {
+        if (!cpf.matches("^\\d{11}$")) {
+            throw new BusinessRuleException("Campo cpf inválido.");
+        }
+
+        if (cpf.chars().distinct().count() == 1) {
+            throw new BusinessRuleException("Campo cpf inválido.");
         }
     }
 
