@@ -204,4 +204,26 @@ public class CadastroUserTest {
         verifyNoInteractions(userRepository);
     }
 
+    @Test
+    void DeveRecusarCadastroComNomeVazio() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123"; 
+        String nome = "";                     
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo nome está vazio.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
 }
