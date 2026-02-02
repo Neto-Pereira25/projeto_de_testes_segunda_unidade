@@ -301,5 +301,188 @@ public class EditarUserTeste {
 
         verify(userRepository, never()).saveUser(any(User.class));
     }
+    @Test
+    void TC_043_atualizarSenha_comSenhaValida_deveAtualizarESalvar() {
+        String email = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+        String novoEmail = "user@gmail.com";
+
+        String novaSenha = "Nov@Senh@123";
+        String confirm = "Nov@Senh@123";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        userLogado.setAddress("X");
+        userLogado.setCep("X");
+        userLogado.setComplement("X");
+        userLogado.setReferencePoint("X");
+
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        editUserService.updateProfileWithPasswordFields(
+                email, senhaAtual, novoEmail, novaSenha, confirm,
+                endereco, numero, cep, complemento, pontoRef
+        );
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveUser(captor.capture());
+
+        User salvo = captor.getValue();
+        assertEquals(novaSenha, salvo.getPassword());
+        assertEquals(novaSenha, salvo.getPasswordConfirmation());
+    }
+
+    @Test
+    void TC_044_atualizarSenha_comSenhaInvalida_deveFalharENaoSalvar() {
+        String email = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+        String novoEmail = "user@gmail.com";
+
+        String novaSenhaInvalida = "NovaSenha"; // inválida pelo validator
+        String confirm = "NovaSenha";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfileWithPasswordFields(
+                        email, senhaAtual, novoEmail, novaSenhaInvalida, confirm,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_045_atualizarSenha_confirmacaoVazia_deveFalharENaoSalvar() {
+        String email = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+        String novoEmail = "user@gmail.com";
+
+        String novaSenha = "Nov@Senh@123";
+        String confirmVazio = "";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfileWithPasswordFields(
+                        email, senhaAtual, novoEmail, novaSenha, confirmVazio,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_046_atualizarSenha_confirmacaoDiferente_deveFalharENaoSalvar() {
+        String email = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+        String novoEmail = "user@gmail.com";
+
+        String novaSenha = "Nov@Senh@123";
+        String confirmDiferente = "Nov@Senh@124";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfileWithPasswordFields(
+                        email, senhaAtual, novoEmail, novaSenha, confirmDiferente,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_047_atualizarSenha_novaESenhaConfirmacaoVazias_deveFalharENaoSalvar() {
+        String email = "user@gmail.com";
+        String senhaAtual = "SenhaAtual@123";
+        String novoEmail = "user@gmail.com";
+
+        String novaSenhaVazia = "";
+        String confirmVazio = "";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaAtual, senhaAtual, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        assertThrows(BusinessRuleException.class, ()
+                -> editUserService.updateProfileWithPasswordFields(
+                        email, senhaAtual, novoEmail, novaSenhaVazia, confirmVazio,
+                        endereco, numero, cep, complemento, pontoRef
+                )
+        );
+
+        verify(userRepository, never()).saveUser(any(User.class));
+    }
+
+    @Test
+    void TC_048_senhaAtualIncorreta_naoTrocaSenha_masAtualizaPerfil_comSucesso() {
+        String email = "user@gmail.com";
+        String senhaReal = "SenhaAtual@123";
+        String senhaDigitadaIncorreta = "SenhaErrada@123";
+
+        String novoEmail = "user@gmail.com";
+
+        // usuário não altera senha
+        String novaSenhaVazia = "";
+        String confirmVazio = "";
+
+        String endereco = "Rua dos bobos";
+        int numero = 0;
+        String cep = "00000-000";
+        String complemento = "Nao tem teto, chao nem parede";
+        String pontoRef = "Nao possui";
+
+        User userLogado = new User(email, senhaReal, senhaReal, "Nome", "Sobrenome", "12345678900", "2000-01-01");
+        when(userRepository.findByEmail(email)).thenReturn(userLogado);
+
+        editUserService.updateProfileWithPasswordFields(
+                email, senhaDigitadaIncorreta, novoEmail, novaSenhaVazia, confirmVazio,
+                endereco, numero, cep, complemento, pontoRef
+        );
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveUser(captor.capture());
+
+        User salvo = captor.getValue();
+        // senha NÃO mudou
+        assertEquals(senhaReal, salvo.getPassword());
+        assertEquals(senhaReal, salvo.getPasswordConfirmation());
+    }
+
 
 }

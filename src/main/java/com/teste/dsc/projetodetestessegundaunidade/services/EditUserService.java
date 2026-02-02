@@ -24,9 +24,9 @@ public class EditUserService {
     }
 
     public EditUserService(UserRepository userRepository,
-                           EmailValidator emailValidator,
-                           PasswordValidator passwordValidator,
-                           VerificationCodeService verificationCodeService) {
+            EmailValidator emailValidator,
+            PasswordValidator passwordValidator,
+            VerificationCodeService verificationCodeService) {
         this.userRepository = userRepository;
         this.emailValidator = emailValidator;
         this.passwordValidator = passwordValidator;
@@ -47,27 +47,35 @@ public class EditUserService {
     ) {
         // 1) autentica primeiro
         User user = userRepository.findByEmailAndPassword(emailAtual, senhaAtual);
-        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
+        if (user == null) {
+            throw new BusinessRuleException("Usuario nao autenticado");
+        }
 
         // 2) valida campos obrigatórios (vazios)
-        if (novoEmail == null || novoEmail.trim().isEmpty())
+        if (novoEmail == null || novoEmail.trim().isEmpty()) {
             throw new BusinessRuleException("Campo email obrigatorio");
+        }
 
-        if (endereco == null || endereco.trim().isEmpty())
+        if (endereco == null || endereco.trim().isEmpty()) {
             throw new BusinessRuleException("Campo endereco obrigatorio");
+        }
 
-        if (numero < 0)
+        if (numero < 0) {
             throw new BusinessRuleException("Campo numero obrigatorio");
+        }
 
-        if (cep == null || cep.trim().isEmpty())
+        if (cep == null || cep.trim().isEmpty()) {
             throw new BusinessRuleException("Campo cep obrigatorio");
+        }
 
         // 3) valida regras de formato
-        if (!emailValidator.isValid(novoEmail))
+        if (!emailValidator.isValid(novoEmail)) {
             throw new BusinessRuleException("Email invalido");
+        }
 
-        if (!passwordValidator.isValid(novaSenha))
+        if (!passwordValidator.isValid(novaSenha)) {
             throw new BusinessRuleException("Senha invalida");
+        }
 
         // 4) atualiza e salva
         user.setEmail(novoEmail);
@@ -98,31 +106,40 @@ public class EditUserService {
     ) {
         // 1) autentica primeiro
         User user = userRepository.findByEmailAndPassword(emailAtual, senhaAtual);
-        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
+        if (user == null) {
+            throw new BusinessRuleException("Usuario nao autenticado");
+        }
 
         // 2) valida campos obrigatórios (mantém coerência com updateProfile)
-        if (novoEmail == null || novoEmail.trim().isEmpty())
+        if (novoEmail == null || novoEmail.trim().isEmpty()) {
             throw new BusinessRuleException("Campo email obrigatorio");
+        }
 
-        if (endereco == null || endereco.trim().isEmpty())
+        if (endereco == null || endereco.trim().isEmpty()) {
             throw new BusinessRuleException("Campo endereco obrigatorio");
+        }
 
-        if (numero < 0)
+        if (numero < 0) {
             throw new BusinessRuleException("Campo numero obrigatorio");
+        }
 
-        if (cep == null || cep.trim().isEmpty())
+        if (cep == null || cep.trim().isEmpty()) {
             throw new BusinessRuleException("Campo cep obrigatorio");
+        }
 
         // 3) valida regras de formato
-        if (!emailValidator.isValid(novoEmail))
+        if (!emailValidator.isValid(novoEmail)) {
             throw new BusinessRuleException("Email invalido");
+        }
 
-        if (!passwordValidator.isValid(novaSenha))
+        if (!passwordValidator.isValid(novaSenha)) {
             throw new BusinessRuleException("Senha invalida");
+        }
 
         // 4) fluxo do código
-        if (verificationCodeService == null)
+        if (verificationCodeService == null) {
             throw new BusinessRuleException("Servico de codigo indisponivel");
+        }
 
         verificationCodeService.sendCode(novoEmail);
 
@@ -135,6 +152,89 @@ public class EditUserService {
         user.setPassword(novaSenha);
         user.setPasswordConfirmation(novaSenha);
 
+        user.setAddress(endereco);
+        user.setNumber(numero);
+        user.setCep(cep);
+        user.setComplement(complemento);
+        user.setReferencePoint(pontoDeReferencia);
+
+        return userRepository.saveUser(user);
+    }
+
+    // TC_043 / TC_044 / TC_045 / TC_046 / TC_047 / TC_048 (campo senha)
+    public User updateProfileWithPasswordFields(
+            String emailAtual,
+            String senhaAtualDigitada,
+            String novoEmail,
+            String novaSenha,
+            String confirmacaoSenha,
+            String endereco,
+            int numero,
+            String cep,
+            String complemento,
+            String pontoDeReferencia
+    ) {
+        // usuário já autenticado: busca por e-mail
+        User user = userRepository.findByEmail(emailAtual);
+        if (user == null) {
+            throw new BusinessRuleException("Usuario nao encontrado");
+        }
+
+        // validações de campos obrigatórios (mesma linha dos TC_039..TC_042)
+        if (novoEmail == null || novoEmail.trim().isEmpty()) {
+            throw new BusinessRuleException("Campo email obrigatorio");
+        }
+
+        if (endereco == null || endereco.trim().isEmpty()) {
+            throw new BusinessRuleException("Campo endereco obrigatorio");
+        }
+
+        if (numero < 0) {
+            throw new BusinessRuleException("Campo numero obrigatorio");
+        }
+
+        if (cep == null || cep.trim().isEmpty()) {
+            throw new BusinessRuleException("Campo cep obrigatorio");
+        }
+
+        // formato do e-mail
+        if (!emailValidator.isValid(novoEmail)) {
+            throw new BusinessRuleException("Email invalido");
+        }
+
+        // regras de senha (TC_043..TC_048) 
+        // Se digitou senha atual:
+        if (senhaAtualDigitada != null && !senhaAtualDigitada.trim().isEmpty()) {
+
+            // Senha atual correta -> exige nova + confirmação e valida tudo
+            if (senhaAtualDigitada.equals(user.getPassword())) {
+
+                if (novaSenha == null || novaSenha.trim().isEmpty()) {
+                    throw new BusinessRuleException("Nova senha obrigatoria");
+                }
+
+                if (confirmacaoSenha == null || confirmacaoSenha.trim().isEmpty()) {
+                    throw new BusinessRuleException("Confirmacao de senha obrigatoria");
+                }
+
+                if (!novaSenha.equals(confirmacaoSenha)) {
+                    throw new BusinessRuleException("Senhas divergentes");
+                }
+
+                if (!passwordValidator.isValid(novaSenha)) {
+                    throw new BusinessRuleException("Senha invalida");
+                }
+
+                // troca de senha OK
+                user.setPassword(novaSenha);
+                user.setPasswordConfirmation(novaSenha);
+            }
+
+            // Senha atual incorreta (TC_048): não troca senha, mas permite atualizar o resto
+        }
+
+        // Atualiza dados do perfil (endereço/email etc.)
+        user.setEmail(novoEmail);
         user.setAddress(endereco);
         user.setNumber(numero);
         user.setCep(cep);
