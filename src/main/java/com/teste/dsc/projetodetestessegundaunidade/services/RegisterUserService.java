@@ -74,6 +74,11 @@ public class RegisterUserService {
         if (email == null || email.isBlank()) {
             throw new BusinessRuleException("Campo e-mail precisa ser preenchido.");
         }
+
+        if (name == null || name.isBlank()) {
+            throw new BusinessRuleException("Campo nome está vazio.");
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
