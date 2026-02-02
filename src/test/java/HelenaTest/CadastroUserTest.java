@@ -148,8 +148,6 @@ public class CadastroUserTest {
         String cpf = "12345678910";
         String dataNascimento = "01/01/1970";
    
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-
         BusinessRuleException ex = assertThrows(
                 BusinessRuleException.class,
                 () -> registerUserService.register(
@@ -159,7 +157,7 @@ public class CadastroUserTest {
 
         assertEquals("Campo nome possui caracteres inválidos.", ex.getMessage());
 
-        verify(userRepository, never()).saveUser(any());
+        verifyNoInteractions(userRepository);
     }
 
 }

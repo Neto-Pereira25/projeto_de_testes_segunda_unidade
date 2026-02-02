@@ -32,6 +32,8 @@ public class RegisterUserService {
 
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
+        validateName(name);
+
         if (!EmailValidator.isValid(email)) {
             throw new BusinessRuleException("Email field is invalid.");
         }
@@ -77,6 +79,13 @@ public class RegisterUserService {
                 || birthDate == null || birthDate.isBlank()) {
 
             throw new BusinessRuleException("Invalid required fields");
+        }
+    }
+
+    private void validateName(String name) {
+        String regex = "^[\\p{L} ]+$";
+        if (!name.matches(regex)) {
+            throw new BusinessRuleException("Campo nome possui caracteres inválidos.");
         }
     }
 
