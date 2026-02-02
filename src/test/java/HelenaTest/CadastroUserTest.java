@@ -142,12 +142,12 @@ public class CadastroUserTest {
     void DeveRecusarCadastroComNomeComCaracteresInvalidos() {
         String email = "user@gmail.com";
         String senha = "Senh@123";
-        String confirmacaoSenha = "Senh@123"; 
-        String nome = "u$u@ri*";             
+        String confirmacaoSenha = "Senh@123";
+        String nome = "u$u@ri*";
         String sobrenome = "silva";
         String cpf = "12345678910";
         String dataNascimento = "01/01/1970";
-   
+
         BusinessRuleException ex = assertThrows(
                 BusinessRuleException.class,
                 () -> registerUserService.register(
@@ -156,6 +156,28 @@ public class CadastroUserTest {
         );
 
         assertEquals("Campo nome possui caracteres inválidos.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSobrenomeComCaracteresInvalidos() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123"; 
+        String nome = "usuario";
+        String sobrenome = "silv@"; 
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo sobrenome possui caracteres inválidos.", ex.getMessage());
 
         verifyNoInteractions(userRepository);
     }
