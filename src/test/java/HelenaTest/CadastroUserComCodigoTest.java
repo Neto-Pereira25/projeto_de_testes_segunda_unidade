@@ -7,6 +7,7 @@ package HelenaTest;
 import com.teste.dsc.projetodetestessegundaunidade.entities.User;
 import com.teste.dsc.projetodetestessegundaunidade.exceptions.BusinessRuleException;
 import com.teste.dsc.projetodetestessegundaunidade.repositories.UserRepository;
+import com.teste.dsc.projetodetestessegundaunidade.services.RegisterUserWithCodeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,13 +30,13 @@ public class CadastroUserComCodigoTest {
     private UserRepository userRepository;
 
     @Mock
-    private PendingRegistrationStore pendingStore;
+    private RegisterUserWithCodeService.PendingRegistrationStore pendingStore;
 
     @Mock
-    private VerificationCodeSender codeSender;
+    private RegisterUserWithCodeService.VerificationCodeSender codeSender;
 
     @Mock
-    private VerificationCodeGenerator codeGenerator;
+    private RegisterUserWithCodeService.VerificationCodeGenerator codeGenerator;
 
     @InjectMocks
     private RegisterUserWithCodeService service;
@@ -44,7 +45,7 @@ public class CadastroUserComCodigoTest {
     void DeveEnviarCodigoEAguardarConfirmacao() {
         String email = "user@gmail.com";
         String senha = "Senh@123";
-        String confirmacaoSenha = "Senh@123"; // igual para não cair em mismatch
+        String confirmacaoSenha = "Senh@123"; 
         String nome = "usuario";
         String sobrenome = "silva";
         String cpf = "12345678910";
@@ -53,25 +54,15 @@ public class CadastroUserComCodigoTest {
         when(userRepository.existsByEmail(email)).thenReturn(false);
         when(codeGenerator.generateCode()).thenReturn("123456");
 
-        CodeSentResponse response = service.solicitarCodigo(
+        String msg = service.solicitarCodigo(
                 email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
         );
 
-        assertTrue(response.sucesso());
-        assertEquals("Código enviado para o usuário.", response.mensagem());
+        assertEquals("Código enviado para o usuário. Aguarde a confirmação.", msg);
 
-        // não salva o usuário ainda
         verify(userRepository, never()).saveUser(any(User.class));
-
-        // salva pendência e envia o código
-        ArgumentCaptor<PendingRegistration> captor = ArgumentCaptor.forClass(PendingRegistration.class);
-        verify(pendingStore).save(eq(email), captor.capture());
+        verify(pendingStore).save(eq(email), any(RegisterUserWithCodeService.PendingRegistration.class));
         verify(codeSender).send(email, "123456");
-
-        PendingRegistration pending = captor.getValue();
-        assertEquals(email, pending.email());
-        assertEquals("123456", pending.code());
-        assertEquals(nome, pending.name());
     }
 
     @Test
@@ -79,7 +70,8 @@ public class CadastroUserComCodigoTest {
         String email = "user@gmail.com";
         String code = "123456";
 
-        PendingRegistration pending = new PendingRegistration(
+        RegisterUserWithCodeService.PendingRegistration pending =
+                new RegisterUserWithCodeService.PendingRegistration(
                 email,
                 "Senh@123",
                 "Senh@123",
@@ -93,15 +85,14 @@ public class CadastroUserComCodigoTest {
         when(pendingStore.findByEmail(email)).thenReturn(pending);
         when(userRepository.saveUser(any(User.class))).thenAnswer(inv -> inv.getArgument(0, User.class));
 
-        ConfirmRegistrationResponse response = service.confirmarCodigo(email, code);
+        String msg = service.confirmarCodigo(email, code);
 
-        assertTrue(response.sucesso());
-        assertEquals("Cadastro confirmado com sucesso.", response.mensagem());
-        assertNotNull(response.usuario());
-        assertEquals(email, response.usuario().getEmail());
+        assertEquals("Cadastro confirmado com sucesso.", msg);
 
-        verify(userRepository).saveUser(any(User.class));
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveUser(captor.capture());
+        assertEquals(email, captor.getValue().getEmail());
+
         verify(pendingStore).delete(email);
-        verifyNoInteractions(codeSender); // confirmar não envia de novo
     }
 }

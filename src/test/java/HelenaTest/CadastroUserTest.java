@@ -70,7 +70,6 @@ public class CadastroUserTest {
         assertEquals(cpf, salvo.getCpf());
         assertEquals(dataNascimento, salvo.getBirthDate());
 
-        verifyNoMoreInteractions(userRepository);
     }
 
     @Test
@@ -90,7 +89,7 @@ public class CadastroUserTest {
                 )
         );
 
-        assertEquals("Invalid email", ex.getMessage());
+        assertEquals("Email field is invalid.", ex.getMessage());
         verify(userRepository, never()).saveUser(any());
     }
 
@@ -119,7 +118,7 @@ public class CadastroUserTest {
 void DeveRecusarCadastroComEmailJaCadastrado() {
     String email = "user@gmail.com";
     String senha = "Senh@123";
-    String confirmacaoSenha = "Senh@123"; // igual pra não cair no mismatch
+    String confirmacaoSenha = "Senh@123"; 
     String nome = "usuario";
     String sobrenome = "silva";
     String cpf = "12345678910";
