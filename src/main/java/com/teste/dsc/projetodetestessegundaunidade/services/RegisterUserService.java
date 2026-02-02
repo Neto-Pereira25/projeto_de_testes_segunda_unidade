@@ -79,6 +79,10 @@ public class RegisterUserService {
             throw new BusinessRuleException("Campo nome está vazio.");
         }
 
+        if (surname == null || surname.isBlank()) {
+            throw new BusinessRuleException("Campo sobrenome está vazio.");
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
