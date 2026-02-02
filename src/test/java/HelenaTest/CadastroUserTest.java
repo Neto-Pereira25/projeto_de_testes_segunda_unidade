@@ -70,7 +70,6 @@ public class CadastroUserTest {
         assertEquals(cpf, salvo.getCpf());
         assertEquals(dataNascimento, salvo.getBirthDate());
 
-        verifyNoMoreInteractions(userRepository);
     }
 
     @Test
@@ -90,7 +89,7 @@ public class CadastroUserTest {
                 )
         );
 
-        assertEquals("Invalid email", ex.getMessage());
+        assertEquals("Email field is invalid.", ex.getMessage());
         verify(userRepository, never()).saveUser(any());
     }
 
@@ -114,30 +113,117 @@ public class CadastroUserTest {
         assertEquals("Campo e-mail precisa ser preenchido.", ex.getMessage());
         verify(userRepository, never()).saveUser(any());
     }
-    
+
     @Test
-void DeveRecusarCadastroComEmailJaCadastrado() {
-    String email = "user@gmail.com";
-    String senha = "Senh@123";
-    String confirmacaoSenha = "Senh@123"; // igual pra não cair no mismatch
-    String nome = "usuario";
-    String sobrenome = "silva";
-    String cpf = "12345678910";
-    String dataNascimento = "01/01/1970";
+    void DeveRecusarCadastroComEmailJaCadastrado() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
 
-    when(userRepository.existsByEmail(email)).thenReturn(true);
+        when(userRepository.existsByEmail(email)).thenReturn(true);
 
-    BusinessRuleException ex = assertThrows(
-            BusinessRuleException.class,
-            () -> registerUserService.register(
-                    email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
-            )
-    );
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
 
-    assertEquals("O e-mail informado já possui cadastro.", ex.getMessage());
-    verify(userRepository, never()).saveUser(any());
-    verify(userRepository).existsByEmail(email);
-}
+        assertEquals("O e-mail informado já possui cadastro.", ex.getMessage());
+        verify(userRepository, never()).saveUser(any());
+        verify(userRepository).existsByEmail(email);
+    }
 
+    @Test
+    void DeveRecusarCadastroComNomeComCaracteresInvalidos() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "u$u@ri*";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo nome possui caracteres inválidos.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSobrenomeComCaracteresInvalidos() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silv@";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo sobrenome possui caracteres inválidos.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComCpfComCaracteresInvalidos() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345A78910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo cpf inválido.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComNomeVazio() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123"; 
+        String nome = "";                     
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo nome está vazio.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
 
 }

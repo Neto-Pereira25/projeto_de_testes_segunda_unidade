@@ -8,7 +8,6 @@ public interface UserRepository {
     User findByEmailAndPassword(String email, String password);
     
     User findByEmail(String email);
-    
     boolean existsByEmail(String email);
 
 }
