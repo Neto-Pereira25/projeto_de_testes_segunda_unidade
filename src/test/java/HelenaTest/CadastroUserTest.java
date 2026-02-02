@@ -292,7 +292,7 @@ public class CadastroUserTest {
     @Test
     void DeveRecusarCadastroComSenhaVazia() {
         String email = "user@gmail.com";
-        String senha = "";                 
+        String senha = "";
         String confirmacaoSenha = "Senh@123";
         String nome = "usuario";
         String sobrenome = "silva";
@@ -308,6 +308,35 @@ public class CadastroUserTest {
 
         assertEquals("Campo senha está vazio.", ex.getMessage());
         verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSenhaInvalida() {
+        String email = "user@gmail.com";
+        String senha = "Senh@1";                
+        String confirmacaoSenha = "Senh@1";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals(
+                "precisa conter caracteres maiúsculos, minúsculos, numéricos e especiais com limite mínimo de 8 e máximo de 32",
+                ex.getMessage()
+        );
+
+        verify(userRepository).existsByEmail(email);
+        verify(userRepository, never()).saveUser(any());
+        verifyNoMoreInteractions(userRepository);
     }
 
 }
