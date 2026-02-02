@@ -33,6 +33,7 @@ public class RegisterUserService {
         validateRequiredFields(email, password, passwordConfirmation, name, surname, cpf, birthDate);
 
         validateName(name);
+        validateSurname(surname);
 
         if (!EmailValidator.isValid(email)) {
             throw new BusinessRuleException("Email field is invalid.");
@@ -86,6 +87,13 @@ public class RegisterUserService {
         String regex = "^[\\p{L} ]+$";
         if (!name.matches(regex)) {
             throw new BusinessRuleException("Campo nome possui caracteres inválidos.");
+        }
+    }
+
+    private void validateSurname(String surname) {
+        String regex = "^[\\p{L} ]+$";
+        if (!surname.matches(regex)) {
+            throw new BusinessRuleException("Campo sobrenome possui caracteres inválidos.");
         }
     }
 
