@@ -208,8 +208,8 @@ public class CadastroUserTest {
     void DeveRecusarCadastroComNomeVazio() {
         String email = "user@gmail.com";
         String senha = "Senh@123";
-        String confirmacaoSenha = "Senh@123"; 
-        String nome = "";                     
+        String confirmacaoSenha = "Senh@123";
+        String nome = "";
         String sobrenome = "silva";
         String cpf = "12345678910";
         String dataNascimento = "01/01/1970";
@@ -222,6 +222,116 @@ public class CadastroUserTest {
         );
 
         assertEquals("Campo nome está vazio.", ex.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSobrenomeVazio() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo sobrenome está vazio.", ex.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComCpfVazio() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo cpf está vazio.", ex.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComDataNascimentoVazia() {
+        String email = "user@gmail.com";
+        String senha = "Senh@123";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo data de nascimento está vazio.", ex.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSenhaVazia() {
+        String email = "user@gmail.com";
+        String senha = "";
+        String confirmacaoSenha = "Senh@123";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals("Campo senha está vazio.", ex.getMessage());
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void DeveRecusarCadastroComSenhaInvalida() {
+        String email = "user@gmail.com";
+        String senha = "Senh@1";
+        String confirmacaoSenha = "Senh@1";
+        String nome = "usuario";
+        String sobrenome = "silva";
+        String cpf = "12345678910";
+        String dataNascimento = "01/01/1970";
+
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> registerUserService.register(
+                        email, senha, confirmacaoSenha, nome, sobrenome, cpf, dataNascimento
+                )
+        );
+
+        assertEquals(
+                "precisa conter caracteres maiúsculos, minúsculos, numéricos e especiais com limite mínimo de 8 e máximo de 32",
+                ex.getMessage()
+        );
 
         verifyNoInteractions(userRepository);
     }
