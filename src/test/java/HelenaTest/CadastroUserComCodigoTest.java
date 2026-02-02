@@ -45,7 +45,7 @@ public class CadastroUserComCodigoTest {
     void DeveEnviarCodigoEAguardarConfirmacao() {
         String email = "user@gmail.com";
         String senha = "Senh@123";
-        String confirmacaoSenha = "Senh@123"; 
+        String confirmacaoSenha = "Senh@123";
         String nome = "usuario";
         String sobrenome = "silva";
         String cpf = "12345678910";
@@ -70,17 +70,17 @@ public class CadastroUserComCodigoTest {
         String email = "user@gmail.com";
         String code = "123456";
 
-        RegisterUserWithCodeService.PendingRegistration pending =
-                new RegisterUserWithCodeService.PendingRegistration(
-                email,
-                "Senh@123",
-                "Senh@123",
-                "usuario",
-                "silva",
-                "12345678910",
-                "01/01/1970",
-                "123456"
-        );
+        RegisterUserWithCodeService.PendingRegistration pending
+                = new RegisterUserWithCodeService.PendingRegistration(
+                        email,
+                        "Senh@123",
+                        "Senh@123",
+                        "usuario",
+                        "silva",
+                        "12345678910",
+                        "01/01/1970",
+                        "123456"
+                );
 
         when(pendingStore.findByEmail(email)).thenReturn(pending);
         when(userRepository.saveUser(any(User.class))).thenAnswer(inv -> inv.getArgument(0, User.class));
@@ -95,4 +95,34 @@ public class CadastroUserComCodigoTest {
 
         verify(pendingStore).delete(email);
     }
+
+    @Test
+    void DeveInvalidarQuandoCodigoForIncorreto() {
+        String email = "user@gmail.com";
+
+        RegisterUserWithCodeService.PendingRegistration pending
+                = new RegisterUserWithCodeService.PendingRegistration(
+                        email,
+                        "Senh@123",
+                        "Senh@123",
+                        "usuario",
+                        "silva",
+                        "12345678910",
+                        "01/01/1970",
+                        "123456" // codigo correto
+                );
+
+        when(pendingStore.findByEmail(email)).thenReturn(pending);
+
+        BusinessRuleException ex = assertThrows(
+                BusinessRuleException.class,
+                () -> service.confirmarCodigo(email, "999999") // codigo errado
+        );
+
+        assertEquals("Código inválido.", ex.getMessage());
+
+        verify(userRepository, never()).saveUser(any());
+        verify(pendingStore, never()).delete(anyString());
+    }
+
 }
