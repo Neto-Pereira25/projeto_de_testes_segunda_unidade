@@ -19,18 +19,32 @@ public class EditUserService {
     // para TC_037/TC_038
     private final VerificationCodeService verificationCodeService;
 
-    public EditUserService(UserRepository userRepository, EmailValidator emailValidator, PasswordValidator passwordValidator) {
-        this(userRepository, emailValidator, passwordValidator, null);
+    // para CEP (se você estiver usando os testes de CEP)
+    private final AddressLookupService addressLookupService;
+
+    public EditUserService(UserRepository userRepository,
+                           EmailValidator emailValidator,
+                           PasswordValidator passwordValidator) {
+        this(userRepository, emailValidator, passwordValidator, null, null);
     }
 
     public EditUserService(UserRepository userRepository,
-            EmailValidator emailValidator,
-            PasswordValidator passwordValidator,
-            VerificationCodeService verificationCodeService) {
+                           EmailValidator emailValidator,
+                           PasswordValidator passwordValidator,
+                           VerificationCodeService verificationCodeService) {
+        this(userRepository, emailValidator, passwordValidator, verificationCodeService, null);
+    }
+
+    public EditUserService(UserRepository userRepository,
+                           EmailValidator emailValidator,
+                           PasswordValidator passwordValidator,
+                           VerificationCodeService verificationCodeService,
+                           AddressLookupService addressLookupService) {
         this.userRepository = userRepository;
         this.emailValidator = emailValidator;
         this.passwordValidator = passwordValidator;
         this.verificationCodeService = verificationCodeService;
+        this.addressLookupService = addressLookupService;
     }
 
     // TC_035 / TC_036 / TC_039 / TC_040 / TC_041 / TC_042
@@ -47,35 +61,27 @@ public class EditUserService {
     ) {
         // 1) autentica primeiro
         User user = userRepository.findByEmailAndPassword(emailAtual, senhaAtual);
-        if (user == null) {
-            throw new BusinessRuleException("Usuario nao autenticado");
-        }
+        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
 
-        // 2) valida campos obrigatórios (vazios)
-        if (novoEmail == null || novoEmail.trim().isEmpty()) {
+        // 2) valida campos obrigatórios
+        if (novoEmail == null || novoEmail.trim().isEmpty())
             throw new BusinessRuleException("Campo email obrigatorio");
-        }
 
-        if (endereco == null || endereco.trim().isEmpty()) {
+        if (endereco == null || endereco.trim().isEmpty())
             throw new BusinessRuleException("Campo endereco obrigatorio");
-        }
 
-        if (numero < 0) {
+        if (numero < 0)
             throw new BusinessRuleException("Campo numero obrigatorio");
-        }
 
-        if (cep == null || cep.trim().isEmpty()) {
+        if (cep == null || cep.trim().isEmpty())
             throw new BusinessRuleException("Campo cep obrigatorio");
-        }
 
         // 3) valida regras de formato
-        if (!emailValidator.isValid(novoEmail)) {
+        if (!emailValidator.isValid(novoEmail))
             throw new BusinessRuleException("Email invalido");
-        }
 
-        if (!passwordValidator.isValid(novaSenha)) {
+        if (!passwordValidator.isValid(novaSenha))
             throw new BusinessRuleException("Senha invalida");
-        }
 
         // 4) atualiza e salva
         user.setEmail(novoEmail);
@@ -104,50 +110,36 @@ public class EditUserService {
             String complemento,
             String pontoDeReferencia
     ) {
-        // 1) autentica primeiro
         User user = userRepository.findByEmailAndPassword(emailAtual, senhaAtual);
-        if (user == null) {
-            throw new BusinessRuleException("Usuario nao autenticado");
-        }
+        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
 
-        // 2) valida campos obrigatórios (mantém coerência com updateProfile)
-        if (novoEmail == null || novoEmail.trim().isEmpty()) {
+        if (novoEmail == null || novoEmail.trim().isEmpty())
             throw new BusinessRuleException("Campo email obrigatorio");
-        }
 
-        if (endereco == null || endereco.trim().isEmpty()) {
+        if (endereco == null || endereco.trim().isEmpty())
             throw new BusinessRuleException("Campo endereco obrigatorio");
-        }
 
-        if (numero < 0) {
+        if (numero < 0)
             throw new BusinessRuleException("Campo numero obrigatorio");
-        }
 
-        if (cep == null || cep.trim().isEmpty()) {
+        if (cep == null || cep.trim().isEmpty())
             throw new BusinessRuleException("Campo cep obrigatorio");
-        }
 
-        // 3) valida regras de formato
-        if (!emailValidator.isValid(novoEmail)) {
+        if (!emailValidator.isValid(novoEmail))
             throw new BusinessRuleException("Email invalido");
-        }
 
-        if (!passwordValidator.isValid(novaSenha)) {
+        if (!passwordValidator.isValid(novaSenha))
             throw new BusinessRuleException("Senha invalida");
-        }
 
-        // 4) fluxo do código
-        if (verificationCodeService == null) {
+        if (verificationCodeService == null)
             throw new BusinessRuleException("Servico de codigo indisponivel");
-        }
 
+        // envia e valida código
         verificationCodeService.sendCode(novoEmail);
 
-        if (!verificationCodeService.isValid(novoEmail, codigoDigitado)) {
+        if (!verificationCodeService.isValid(novoEmail, codigoDigitado))
             throw new BusinessRuleException("Codigo invalido");
-        }
 
-        // 5) atualiza e salva
         user.setEmail(novoEmail);
         user.setPassword(novaSenha);
         user.setPasswordConfirmation(novaSenha);
@@ -161,7 +153,7 @@ public class EditUserService {
         return userRepository.saveUser(user);
     }
 
-    // TC_043 / TC_044 / TC_045 / TC_046 / TC_047 / TC_048 (campo senha)
+    // TC_043 até TC_048 (fluxo de senha do SEU PRINT)
     public User updateProfileWithPasswordFields(
             String emailAtual,
             String senhaAtualDigitada,
@@ -174,70 +166,102 @@ public class EditUserService {
             String complemento,
             String pontoDeReferencia
     ) {
-        // usuário já autenticado: busca por e-mail
+        // No seu teste (44..48) você mocka findByEmail(email), então usamos isso aqui
         User user = userRepository.findByEmail(emailAtual);
-        if (user == null) {
-            throw new BusinessRuleException("Usuario nao encontrado");
-        }
+        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
 
-        // validações de campos obrigatórios (mesma linha dos TC_039..TC_042)
-        if (novoEmail == null || novoEmail.trim().isEmpty()) {
+        // obrigatórios do perfil (mantém coerência)
+        if (novoEmail == null || novoEmail.trim().isEmpty())
             throw new BusinessRuleException("Campo email obrigatorio");
-        }
 
-        if (endereco == null || endereco.trim().isEmpty()) {
+        if (endereco == null || endereco.trim().isEmpty())
             throw new BusinessRuleException("Campo endereco obrigatorio");
-        }
 
-        if (numero < 0) {
+        if (numero < 0)
             throw new BusinessRuleException("Campo numero obrigatorio");
-        }
 
-        if (cep == null || cep.trim().isEmpty()) {
+        if (cep == null || cep.trim().isEmpty())
             throw new BusinessRuleException("Campo cep obrigatorio");
-        }
 
-        // formato do e-mail
-        if (!emailValidator.isValid(novoEmail)) {
+        if (!emailValidator.isValid(novoEmail))
             throw new BusinessRuleException("Email invalido");
-        }
 
-        // regras de senha (TC_043..TC_048) 
-        // Se digitou senha atual:
-        if (senhaAtualDigitada != null && !senhaAtualDigitada.trim().isEmpty()) {
+        // verifica se senha atual bate
+        boolean senhaAtualOk = user.getPassword() != null && user.getPassword().equals(senhaAtualDigitada);
 
-            // Senha atual correta -> exige nova + confirmação e valida tudo
-            if (senhaAtualDigitada.equals(user.getPassword())) {
+        boolean novaVazia = (novaSenha == null || novaSenha.trim().isEmpty());
+        boolean confirmVazia = (confirmacaoSenha == null || confirmacaoSenha.trim().isEmpty());
+        boolean querTrocarSenha = !(novaVazia && confirmVazia);
 
-                if (novaSenha == null || novaSenha.trim().isEmpty()) {
-                    throw new BusinessRuleException("Nova senha obrigatoria");
-                }
-
-                if (confirmacaoSenha == null || confirmacaoSenha.trim().isEmpty()) {
-                    throw new BusinessRuleException("Confirmacao de senha obrigatoria");
-                }
-
-                if (!novaSenha.equals(confirmacaoSenha)) {
-                    throw new BusinessRuleException("Senhas divergentes");
-                }
-
-                if (!passwordValidator.isValid(novaSenha)) {
-                    throw new BusinessRuleException("Senha invalida");
-                }
-
-                // troca de senha OK
-                user.setPassword(novaSenha);
-                user.setPasswordConfirmation(novaSenha);
+        // Regra para satisfazer seus cenários:
+        // - TC_047: senha atual correta + nova/confirm vazias => ERRO
+        // - TC_048: senha atual INCORRETA + nova/confirm vazias => OK (não troca senha)
+        if (!querTrocarSenha) {
+            if (senhaAtualOk) {
+                throw new BusinessRuleException("Campos senha obrigatorios");
             }
+            // não quer trocar senha (e senha atual está incorreta) => atualiza só o perfil
+        } else {
+            // quer trocar senha => senha atual precisa ser correta
+            if (!senhaAtualOk) throw new BusinessRuleException("Senha atual invalida");
 
-            // Senha atual incorreta (TC_048): não troca senha, mas permite atualizar o resto
+            // confirmação obrigatória
+            if (confirmVazia) throw new BusinessRuleException("Confirmacao de senha obrigatoria");
+
+            // nova senha obrigatória
+            if (novaVazia) throw new BusinessRuleException("Nova senha obrigatoria");
+
+            // precisa bater
+            if (!novaSenha.equals(confirmacaoSenha))
+                throw new BusinessRuleException("Confirmacao de senha divergente");
+
+            // valida regra da senha (validator)
+            if (!passwordValidator.isValid(novaSenha))
+                throw new BusinessRuleException("Senha invalida");
+
+            // troca senha
+            user.setPassword(novaSenha);
+            user.setPasswordConfirmation(novaSenha);
         }
 
-        // Atualiza dados do perfil (endereço/email etc.)
+        // Atualiza os outros campos (sempre)
         user.setEmail(novoEmail);
         user.setAddress(endereco);
         user.setNumber(numero);
         user.setCep(cep);
+        user.setComplement(complemento);
+        user.setReferencePoint(pontoDeReferencia);
+
+        return userRepository.saveUser(user);
+    }
+
+    // CEP válido / inválido (caso você esteja usando)
+    public User updateAddressByCep(
+            String emailAtual,
+            String senhaAtual,
+            String cep,
+            String complemento,
+            String pontoDeReferencia
+    ) {
+        User user = userRepository.findByEmailAndPassword(emailAtual, senhaAtual);
+        if (user == null) throw new BusinessRuleException("Usuario nao autenticado");
+
+        if (cep == null || cep.trim().isEmpty())
+            throw new BusinessRuleException("Campo cep obrigatorio");
+
+        if (addressLookupService == null)
+            throw new BusinessRuleException("Servico de CEP indisponivel");
+
+        AddressLookupService.AddressResult result = addressLookupService.lookupByCep(cep);
+
+        if (result == null || result.getEndereco() == null || result.getEndereco().trim().isEmpty()) {
+            throw new BusinessRuleException("CEP invalido");
+        }
+
+        user.setCep(cep);
+        user.setAddress(result.getEndereco());
+        user.setNumber(result.getNumero());
+
         user.setComplement(complemento);
         user.setReferencePoint(pontoDeReferencia);
 
