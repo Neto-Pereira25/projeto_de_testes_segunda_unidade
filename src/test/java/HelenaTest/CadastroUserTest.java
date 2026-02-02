@@ -313,14 +313,13 @@ public class CadastroUserTest {
     @Test
     void DeveRecusarCadastroComSenhaInvalida() {
         String email = "user@gmail.com";
-        String senha = "Senh@1";                
+        String senha = "Senh@1";
         String confirmacaoSenha = "Senh@1";
         String nome = "usuario";
         String sobrenome = "silva";
         String cpf = "12345678910";
         String dataNascimento = "01/01/1970";
 
-        when(userRepository.existsByEmail(email)).thenReturn(false);
 
         BusinessRuleException ex = assertThrows(
                 BusinessRuleException.class,
@@ -334,9 +333,7 @@ public class CadastroUserTest {
                 ex.getMessage()
         );
 
-        verify(userRepository).existsByEmail(email);
-        verify(userRepository, never()).saveUser(any());
-        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(userRepository);
     }
 
 }

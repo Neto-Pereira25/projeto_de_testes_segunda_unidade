@@ -95,6 +95,12 @@ public class RegisterUserService {
             throw new BusinessRuleException("Campo senha está vazio.");
         }
 
+        if (!PasswordValidator.isValid(password)) {
+            throw new BusinessRuleException(
+                    "precisa conter caracteres maiúsculos, minúsculos, numéricos e especiais com limite mínimo de 8 e máximo de 32"
+            );
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
