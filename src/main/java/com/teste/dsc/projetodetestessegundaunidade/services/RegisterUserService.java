@@ -87,6 +87,10 @@ public class RegisterUserService {
             throw new BusinessRuleException("Campo cpf está vazio.");
         }
 
+        if (birthDate == null || birthDate.isBlank()) {
+            throw new BusinessRuleException("Campo data de nascimento está vazio.");
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
