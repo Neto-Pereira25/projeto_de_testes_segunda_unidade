@@ -91,6 +91,10 @@ public class RegisterUserService {
             throw new BusinessRuleException("Campo data de nascimento está vazio.");
         }
 
+        if (password == null || password.isBlank()) {
+            throw new BusinessRuleException("Campo senha está vazio.");
+        }
+
         if (name == null || name.isBlank()
                 || surname == null || surname.isBlank()
                 || email == null || email.isBlank()
