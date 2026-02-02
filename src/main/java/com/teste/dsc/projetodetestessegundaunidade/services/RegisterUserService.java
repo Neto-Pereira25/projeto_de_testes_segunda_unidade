@@ -34,6 +34,7 @@ public class RegisterUserService {
 
         validateName(name);
         validateSurname(surname);
+        validateCpf(cpf);
 
         if (!EmailValidator.isValid(email)) {
             throw new BusinessRuleException("Email field is invalid.");
@@ -94,6 +95,16 @@ public class RegisterUserService {
         String regex = "^[\\p{L} ]+$";
         if (!surname.matches(regex)) {
             throw new BusinessRuleException("Campo sobrenome possui caracteres inválidos.");
+        }
+    }
+
+    private void validateCpf(String cpf) {
+        if (!cpf.matches("^\\d{11}$")) {
+            throw new BusinessRuleException("Campo cpf inválido.");
+        }
+
+        if (cpf.chars().distinct().count() == 1) {
+            throw new BusinessRuleException("Campo cpf inválido.");
         }
     }
 
